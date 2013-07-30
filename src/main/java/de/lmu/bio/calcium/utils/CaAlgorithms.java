@@ -1,13 +1,13 @@
 package de.lmu.bio.calcium.utils;
+import javax.vecmath.Point2d;
 import java.awt.*;
-import java.awt.geom.Point2D;
 
 public class CaAlgorithms {
 
     //Ramer–Douglas–Peucker algorithm
-    public static Point2D.Double[] downSamplePathRDP(Point2D.Double[] input, int start, int end, double eps) {
-        Point2D.Double a = input[start];
-        Point2D.Double b = input[end];
+    public static Point2d[] downSamplePathRDP(Point2d[] input, int start, int end, double eps) {
+        Point2d a = input[start];
+        Point2d b = input[end];
 
         double dMax = Double.MIN_VALUE;
         int    iMax = 0;
@@ -19,24 +19,24 @@ public class CaAlgorithms {
             }
         }
 
-        Point2D.Double[] result;
+        Point2d[] result;
         if (!(dMax < eps)) {
-            Point2D.Double[] X = downSamplePathRDP(input, start, iMax, eps);
-            Point2D.Double[] Y = downSamplePathRDP(input, iMax, end, eps);
+            Point2d[] X = downSamplePathRDP(input, start, iMax, eps);
+            Point2d[] Y = downSamplePathRDP(input, iMax, end, eps);
 
             System.err.print(X.length);
-            result = new Point2D.Double[X.length + Y.length - 1];
+            result = new Point2d[X.length + Y.length - 1];
             System.arraycopy(X, 0, result, 0, X.length - 1);
             System.arraycopy(Y, 0, result, X.length - 1, Y.length);
         } else {
-            result = new Point2D.Double[] {input[start], input[end]};
+            result = new Point2d[] {input[start], input[end]};
         }
 
         return result;
     }
 
     //*****
-    public static double calcDistance (Point2D.Double a, Point2D.Double b, Point2D.Double x) {
+    public static double calcDistance (Point2d a, Point2d b, Point2d x) {
         double len = Math.hypot(b.x - a.x, b.y - a.y);
         double nom = Math.abs((x.x - a.x) * (b.y - a.y) - (x.y - a.y) * (b.x - a.x));
         return nom / len;
