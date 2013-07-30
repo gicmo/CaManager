@@ -1,0 +1,55 @@
+<assembly>
+    <id>plugin</id>
+    <formats>
+        <format>jar</format>
+    </formats>
+    <includeBaseDirectory>false</includeBaseDirectory>
+    <dependencySets>
+        <dependencySet>
+            <!--
+               Project artifact is not copied under library directory since
+               it is added to the root directory of the zip package.
+           -->
+            <useProjectArtifact>false</useProjectArtifact>
+            <outputDirectory>/</outputDirectory>
+            <unpack>true</unpack>
+			<!--
+            <excludes>
+			        <exclude>net.imagej:ij</exclude>
+                    <exclude>sc.fiji:*</exclude>
+
+			</excludes>
+            -->
+            <includes>
+                <include>commons-io:commons-io</include>
+                <include>com.googlecode.json-simple:json-simple</include>
+                <include>org.netbeans.api:org-netbeans-swing-outline</include>
+                <include>jgoodies:forms</include>
+                <include>org.hdfgroup:*</include>
+            </includes>
+
+        </dependencySet>
+    </dependencySets>
+    <fileSets>
+        <!--
+           Adds startup scripts to the root directory of zip package. The startup
+           scripts are located to src/main/scripts directory as stated by Maven
+           conventions.
+
+        <fileSet>
+            <directory>${project.build.scriptSourceDirectory}</directory>
+            <outputDirectory></outputDirectory>
+            <includes>
+                <include>startup.*</include>
+            </includes>
+        </fileSet>
+       -->
+        <!-- adds jar package to the root directory of zip package -->
+
+            <fileSet>
+                <directory>target/classes</directory>
+                <outputDirectory>/</outputDirectory>
+            </fileSet>
+    </fileSets>
+
+</assembly>

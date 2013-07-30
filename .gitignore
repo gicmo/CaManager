@@ -1,0 +1,12 @@
+*.class
+*.DS_Store
+*.swap
+*.out
+*~
+
+*.dll
+*.jnilib
+
+workspace.xml
+tasks.xml
+

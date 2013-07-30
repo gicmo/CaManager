@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: sc.fiji:Simple_Neurite_Tracer:2.0.2-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/sc/fiji/Simple_Neurite_Tracer/2.0.2-SNAPSHOT/Simple_Neurite_Tracer-2.0.2-20130724.213508-5.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/sc/fiji/Simple_Neurite_Tracer/2.0.2-SNAPSHOT/Simple_Neurite_Tracer-2.0.2-20130724.213508-5-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/sc/fiji/Simple_Neurite_Tracer/2.0.2-SNAPSHOT/Simple_Neurite_Tracer-2.0.2-20130724.213508-5-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
