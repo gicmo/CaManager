@@ -37,7 +37,7 @@ public class CaAlgorithms {
 
     //*****
     public static double calcDistance (Point2d a, Point2d b, Point2d x) {
-        double len = Math.hypot(b.x - a.x, b.y - a.y);
+        double len = a.distance(b);
         double nom = Math.abs((x.x - a.x) * (b.y - a.y) - (x.y - a.y) * (b.x - a.x));
         return nom / len;
     }
