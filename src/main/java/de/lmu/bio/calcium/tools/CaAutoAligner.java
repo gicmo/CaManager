@@ -90,7 +90,7 @@ public class CaAutoAligner extends CaTask {
             Point shift = CaImageUtils.estimateDrift(ref.ip, cur.ip, tol, ref.inlay, cur.inlay);
             System.err.printf("shift: %d %d\n", shift.x, shift.y);
             cur.img.copyRois(ref.img, shift);
-            treeModel.nodeChanged(cur.img);
+            treeModel.nodeStructureChanged(cur.img);
 
         }
     }

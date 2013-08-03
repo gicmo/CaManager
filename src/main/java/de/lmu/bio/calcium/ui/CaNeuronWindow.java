@@ -189,6 +189,7 @@ public class CaNeuronWindow extends JFrame implements CaOutline.Delegate, ImageL
             if (wnd == null) {
                 CaImage roiSource = findClosestRoi(image);
                 image.copyRois(roiSource);
+                treeModel.nodeStructureChanged(image);
                 wnd = CaImageWindow.createWindow(image, treeModel);
 
                 if (wnd != null) {
