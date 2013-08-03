@@ -13,6 +13,7 @@ import java.awt.*;
 //http://rsbweb.nih.gov/ij/developer/api/ij/plugin/filter/ExtendedPlugInFilter.html
 public class CaRoiCloner_ implements ExtendedPlugInFilter {
 
+    String name;
     ImagePlus imp;
     Point shift;
     int x;
@@ -28,6 +29,7 @@ public class CaRoiCloner_ implements ExtendedPlugInFilter {
     public void run(ImageProcessor ip) {
         Roi source = imp.getRoi();
         Roi target = CaRoiCloner.cloneMove(source, shift);
+        target.setName(name);
         imp.setRoi(target, true);
     }
 
@@ -38,6 +40,7 @@ public class CaRoiCloner_ implements ExtendedPlugInFilter {
 
         gd.addNumericField("x",   0.0, 0);
         gd.addNumericField("y", -10.0, 0);
+        gd.addStringField("Name", "BG");
         gd.showDialog();
 
         if (gd.wasCanceled())
@@ -47,6 +50,7 @@ public class CaRoiCloner_ implements ExtendedPlugInFilter {
         int y = (int) gd.getNextNumber();
 
         shift = new Point(x, y);
+        name = gd.getNextString();
 
         return DOES_ALL+ROI_REQUIRED+NO_CHANGES;
     }
