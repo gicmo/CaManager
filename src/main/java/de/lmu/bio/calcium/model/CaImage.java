@@ -135,7 +135,7 @@ public class CaImage extends CaTreeNode {
 
             CaRoiBox box = (CaRoiBox) child;
 
-            if (box.getName() == name) {
+            if (box.getName().equals(name)) {
                 result = box;
                 break;
             }
