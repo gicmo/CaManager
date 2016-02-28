@@ -1,4 +1,5 @@
-*.class
+target/
+
 *.DS_Store
 *.swap
 *.out
@@ -6,8 +7,11 @@
 
 *.dll
 *.jnilib
+*.dylib
+*.so
 
-workspace.xml
 tasks.xml
-target/
 
+# idea
+.idea/
+Calcium.iml
