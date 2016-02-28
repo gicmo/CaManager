@@ -6,7 +6,7 @@
 
     <groupId>de.bio.lmu</groupId>
     <artifactId>Calcium</artifactId>
-    <version>0.2</version>
+    <version>0.3</version>
 
     <properties>
         <hdf5.version>2.8.0</hdf5.version>
