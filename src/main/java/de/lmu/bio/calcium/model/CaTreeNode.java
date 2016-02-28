@@ -16,7 +16,7 @@ public class CaTreeNode extends DefaultMutableTreeNode{
         super("");
     }
 
-    protected transient Object propertyLock = new Object();
+    final protected transient Object propertyLock = new Object();
     private PropertyChangeSupport kvoSupport = new PropertyChangeSupport(this);
 
     protected void notifyPropertyChange(String name, Object oldVlaue, Object newValue) {
