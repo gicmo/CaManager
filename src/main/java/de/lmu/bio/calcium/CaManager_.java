@@ -14,7 +14,7 @@ public class CaManager_ implements PlugIn {
         String hdflib = null;
 
         if (osid.equals("Mac OS X")) {
-            hdflib = "macosx/libjhdf5.jnilib";
+            hdflib = "macosx/libjhdf5.dylib";
         } else if (osid.startsWith("Windows")) {
             String archStr = System.getProperty("os.arch");
             System.err.println(archStr);
