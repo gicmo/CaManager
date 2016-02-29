@@ -22,9 +22,8 @@ public class CaSettings {
 
 
     public File getDataDir() {
-        String defaultDir = prefs.get("DataDir", "");
-        File f = new File(defaultDir);
-        return f;
+        String defaultDir = prefs.get("DataDir", System.getProperty("user.home"));
+        return new File(defaultDir);
     }
 
     public void setDataDir(File f) {
@@ -33,7 +32,7 @@ public class CaSettings {
             path = f.getAbsolutePath();
         }
 
-        prefs.put("DataDir",path);
+        prefs.put("DataDir", path);
     }
 
     public String getTemplate() {
