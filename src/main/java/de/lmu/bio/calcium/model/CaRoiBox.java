@@ -34,11 +34,11 @@ public class CaRoiBox extends CaTreeNode {
     }
 
     public boolean isForeground() {
-        return getName() == "FG";
+        return getName().equals("FG");
     }
 
     public boolean isBackground() {
-        return getName() == "BG";
+        return getName().equals("BG");
     }
 
 }
