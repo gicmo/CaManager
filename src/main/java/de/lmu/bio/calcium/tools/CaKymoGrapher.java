@@ -46,12 +46,17 @@ public class CaKymoGrapher {
     }
 
     public static float[][] createRawKymoGraph(ImagePlus imp, Roi roi) {
+        Point2d points[] = roi2YX(roi);
+        final float width = roi.getStrokeWidth();
+        return createRawKymoGraph(imp, points, width);
+    }
+
+    public static float[][] createRawKymoGraph(ImagePlus imp, Point2d[] points, float width) {
+        //FIXME: width!!
         ImageStack stack = imp.getImageStack();
-
         int stackSize = stack.getSize();
-        Point2d[] points = roi2YX(roi);
 
-        if (points == null) {
+        if (points == null || points.length == 0) {
             return null;
         }
 
