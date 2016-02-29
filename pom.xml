@@ -89,12 +89,14 @@
             <version>1.1.1</version>
         </dependency>
 
+        <!-- NIX -->
         <dependency>
-            <groupId>org.bytedeco</groupId>
-            <artifactId>javacpp</artifactId>
-            <version>1.1</version>
+            <groupId>org.g_node</groupId>
+            <artifactId>nix-${os.id}-${os.arch}</artifactId>
+            <version>1.1.0</version>
         </dependency>
 
+        <!-- H5 -->
         <dependency>
             <groupId>org.hdfgroup</groupId>
             <artifactId>jhdf5</artifactId>
@@ -170,5 +172,63 @@
         </repository>
 
     </repositories>
+
+    <!-- This is for nix -->
+    <profiles>
+        <profile>
+            <id>osx</id>
+            <activation>
+                <os><name>mac os x</name></os>
+            </activation>
+            <properties>
+                <os.id>macosx</os.id>
+            </properties>
+        </profile>
+        <profile>
+            <id>linux</id>
+            <activation>
+                <os>
+                    <name>linux</name>
+                </os>
+            </activation>
+            <properties>
+                <os.id>linux</os.id>
+            </properties>
+        </profile>
+        <profile>
+            <id>windows</id>
+            <activation>
+                <os>
+                    <family>windows</family>
+                </os>
+            </activation>
+            <properties>
+                <os.id>windows</os.id>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>amd64</id>
+            <activation>
+                <os>
+                    <arch>amd64</arch>
+                </os>
+            </activation>
+            <properties>
+                <os.arch>x86_64</os.arch>
+            </properties>
+        </profile>
+        <profile>
+            <id>x86-64</id>
+            <activation>
+                <os>
+                    <arch>x86-64</arch>
+                </os>
+            </activation>
+            <properties>
+                <os.arch>x86_64</os.arch>
+            </properties>
+        </profile>
+    </profiles>
 
 </project>
