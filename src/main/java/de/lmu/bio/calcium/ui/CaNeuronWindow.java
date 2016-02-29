@@ -132,24 +132,11 @@ public class CaNeuronWindow extends JFrame implements CaOutline.Delegate, ImageL
 
     @MenuEntry(entryid = 4)
     public void addFiles() {
-        JFileChooser fileChooser = new JFileChooser();
-        fileChooser.setMultiSelectionEnabled(true);
-        fileChooser.setDialogTitle("Select Image files");
-        fileChooser.setToolTipText("Select the image files you want to add to the new neuron");
-        fileChooser.setSelectedFile(settings.getDataDir());
-        FileNameExtensionFilter filter = new FileNameExtensionFilter(
-                "TIFF Files", "tiff", "tif"); //FIXME
-        fileChooser.setFileFilter(filter);
-        int ret = fileChooser.showOpenDialog(this);
 
-        if (ret != JFileChooser.APPROVE_OPTION) {
-            return;
-        }
+        File[] files = CaDialogUtils.getImageFiles(this);
 
-        File[] files = fileChooser.getSelectedFiles();
         if (files == null || files.length == 0)
             return;
-
 
         CaNeuron neuron = (CaNeuron) treeModel.getRoot();
         for (File f : files) {
@@ -296,20 +283,18 @@ public class CaNeuronWindow extends JFrame implements CaOutline.Delegate, ImageL
     @MenuEntry(entryid = 1)
     public void load() {
 
-        JFileChooser fileChooser = new JFileChooser();
-        fileChooser.setMultiSelectionEnabled(false);
-        fileChooser.setDialogTitle("Open File");
-        fileChooser.setToolTipText("Select the file to open");
-        FileNameExtensionFilter filter = new FileNameExtensionFilter(
-                "HDF5 File", "h5", "hdf5");
-        fileChooser.setFileFilter(filter);
-        fileChooser.setSelectedFile(settings.getDataDir());
+        FileDialog fd = new FileDialog(this, "Open File", FileDialog.LOAD);
+        fd.setMultipleMode(false);
+        fd.setDirectory(settings.getDataDir().getAbsolutePath());
+        fd.setFilenameFilter((dir, name) -> name.endsWith(".h5") || name.endsWith(".hdf5") || name.endsWith(".nix"));
 
-        int ret = fileChooser.showOpenDialog(this);
-        if (ret != JFileChooser.APPROVE_OPTION) {
+        fd.setVisible(true);
+
+        File[] ret = fd.getFiles();
+        if (ret == null || ret.length == 0)
             return;
-        }
-        String path = fileChooser.getSelectedFile().getAbsolutePath();
+
+        String path = ret[0].getAbsolutePath();
 
         CaH5Importer importer = new CaH5Importer(path);
         startTask();

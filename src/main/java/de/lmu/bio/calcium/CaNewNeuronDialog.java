@@ -2,6 +2,7 @@ package de.lmu.bio.calcium;
 
 import de.lmu.bio.calcium.model.CaImage;
 import de.lmu.bio.calcium.model.CaNeuron;
+import de.lmu.bio.calcium.ui.CaDialogUtils;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -214,22 +215,9 @@ public class CaNewNeuronDialog extends JDialog {
 
 
     private void addFiles() {
-        JFileChooser fileChooser = new JFileChooser();
-        fileChooser.setMultiSelectionEnabled(true);
-        fileChooser.setDialogTitle("Select Image files");
-        fileChooser.setToolTipText("Select the image files you want to add to the new neuron");
-        fileChooser.setSelectedFile(settings.getDataDir());
-        FileNameExtensionFilter filter = new FileNameExtensionFilter(
-                "TIFF Files", "tiff", "tif"); //FIXME
-        fileChooser.setFileFilter(filter);
-        int ret = fileChooser.showOpenDialog(this);
-
-        if (ret != JFileChooser.APPROVE_OPTION) {
-            return;
-        }
-
         boolean init = files.size() == 0;
-        File[] files = fileChooser.getSelectedFiles();
+
+        File[] files = CaDialogUtils.getImageFiles(this);
         if (files == null || files.length == 0)
             return;
 
