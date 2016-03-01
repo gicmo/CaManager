@@ -26,6 +26,96 @@ public class CaNIXExporter extends CaTask {
         this.path = path;
     }
 
+    //
+
+    class KymoExporter {
+        private Block block;
+        private Group group;
+        private ImagePlus imp;
+
+        public KymoExporter(Block block, Group g, ImagePlus imp) {
+            this.block = block;
+            this.group = g;
+            this.imp = imp;
+        }
+
+        public boolean exportKymo(Roi roi) {
+            String name = group.getName();
+
+            Point2d[] xy = CaKymoGrapher.roi2YX(roi);
+            float width = roi.getStrokeWidth();
+            float[][] data = CaKymoGrapher.createRawKymoGraph(imp, xy, width);
+
+            if (data == null) {
+                return false;
+            }
+
+            NDSize shape = mkSize(data);
+            float[] flat = flatten(data);
+
+            DataArray da = block.createDataArray(name + ".kymo.fg", "kymo.fg", DataType.Float, shape);
+            da.setData(flat, shape, new NDSize(2, 0));
+
+            group.addDataArray(da);
+
+            DataArray rd = saveRoiData(roi, name + ".roi.xy.fg");
+
+            if (rd.isInitialized()) {
+                group.addDataArray(rd);
+            }
+
+            return true;
+        }
+
+        public DataArray saveRoiData(Roi roi, String name) {
+            int roiType = roi.getType();
+
+            if (!(roiType == Roi.POLYLINE || roiType == Roi.FREELINE)) {
+                IJ.error("Unsupported ROI type.");
+                return new DataArray();
+            }
+
+            float strokeWidth = roi.getStrokeWidth();
+
+            FloatPolygon p = roi.getFloatPolygon();
+            int n = p.npoints;
+            float[] x = p.xpoints;
+            float[] y = p.ypoints;
+
+            DataArray da = block.createDataArray(name, "roi.coordinates", DataType.Float, new NDSize(new int[]{2, n}));
+            da.setData(x, new NDSize(new int[]{1, n}), new NDSize(new int[]{0, 0}));
+            da.setData(y, new NDSize(new int[]{1, n}), new NDSize(new int[]{1, 0}));
+
+            Section root = block.getMetadata();
+            Section meta = root.createSection(name, "roi");
+
+            meta.createProperty("type", new Value(roiType));
+            meta.createProperty("strokeWidth", new Value(strokeWidth));
+
+            return da;
+        }
+
+    }
+
+    static float[] flatten(float[][] data) {
+        int m = data.length;
+        int n = data[0].length;
+
+        float[] flat = new float[m*n];
+        for (int i = 0; i < m; i++) {
+            System.arraycopy(data[i], 0, flat, n*i, n);
+        }
+
+        return flat;
+    }
+
+    static NDSize mkSize(float[][] data) {
+        if (data == null) {
+            return new NDSize();
+        }
+
+        return new NDSize(new int[]{data.length, data[0].length});
+    }
 
     @Override
     public void runTask() throws Exception {
@@ -74,65 +164,16 @@ public class CaNIXExporter extends CaTask {
                 continue;
             }
 
-            Point2d[] xy = CaKymoGrapher.roi2YX(roi);
-            float width = roi.getStrokeWidth();
-            float[][] data = CaKymoGrapher.createRawKymoGraph(ip, xy, width);
+            KymoExporter exporter = new KymoExporter(b, g, ip);
+            exporter.exportKymo(roi);
 
-            if (data == null) {
-                continue;
-            }
-
-            int m = data.length;
-            int n = data[0].length;
-
-            float[] flat = new float[m*n];
-            for (int i = 0; i < m; i++) {
-                System.arraycopy(data[i], 0, flat, n*i, n);
-            }
-
-            NDSize shape = new NDSize(new int[]{m, n});
-            DataArray da = b.createDataArray(name + ".fg.kymo", "kymo.fg", DataType.Float, shape);
-            da.setData(flat, shape, new NDSize(2, 0));
-
-            g.addDataArray(da);
-
-            DataArray roiFg = saveRoiData(roi, name + ".roi.xy.fg", b);
-            if (roiFg.isInitialized()) {
-                g.addDataArray(roiFg);
-            }
         }
 
         fd.close();
     }
 
 
-    public DataArray saveRoiData(Roi roi, String name, Block parent) {
-        int roiType = roi.getType();
 
-        if (!(roiType == Roi.POLYLINE || roiType == Roi.FREELINE)) {
-            IJ.error("Unsupported ROI type.");
-            return new DataArray();
-        }
-
-        float strokeWidth = roi.getStrokeWidth();
-
-        FloatPolygon p = roi.getFloatPolygon();
-        int n = p.npoints;
-        float[] x = p.xpoints;
-        float[] y = p.ypoints;
-
-        DataArray da = parent.createDataArray(name, "roi.coordinates", DataType.Float, new NDSize(new int[]{2, n}));
-        da.setData(x, new NDSize(new int[]{1, n}), new NDSize(new int[]{0, 0}));
-        da.setData(y, new NDSize(new int[]{1, n}), new NDSize(new int[]{1, 0}));
-
-        Section root = parent.getMetadata();
-        Section meta = root.createSection(name, "roi");
-
-        meta.createProperty("type", new Value(roiType));
-        meta.createProperty("strokeWidth", new Value(strokeWidth));
-
-        return da;
-    }
 
 }
 
