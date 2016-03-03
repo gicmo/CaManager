@@ -13,6 +13,7 @@ import java.util.ArrayList;
 
 import ij.process.FloatPolygon;
 import org.g_node.nix.*;
+import sun.security.x509.DNSName;
 
 public class CaNIXExporter extends CaTask {
     private CaNeuron neuron;
@@ -40,6 +41,12 @@ public class CaNIXExporter extends CaTask {
         }
 
         public boolean exportKymo(Roi roi) {
+            int roiType = roi.getType();
+            if (!(roiType == Roi.POLYLINE || roiType == Roi.FREELINE)) {
+                IJ.error("Unsupported ROI type.");
+                return false;
+            }
+
             String name = group.getName();
 
             Point2d[] xy = CaKymoGrapher.roi2YX(roi);
@@ -58,26 +65,20 @@ public class CaNIXExporter extends CaTask {
 
             group.addDataArray(da);
 
-            DataArray rd = saveRoiData(roi, name + ".roi.xy.fg");
+            DataArray rd = saveRoiData(roi, name + ".roi.pt.fg");
+            group.addDataArray(rd);
 
-            if (rd.isInitialized()) {
-                group.addDataArray(rd);
-            }
+            DataArray roiXY = saveRoiXY(xy, name + ".roi.xy.fg");
+            group.addDataArray(roiXY);
 
             return true;
         }
 
         public DataArray saveRoiData(Roi roi, String name) {
             int roiType = roi.getType();
-
-            if (!(roiType == Roi.POLYLINE || roiType == Roi.FREELINE)) {
-                IJ.error("Unsupported ROI type.");
-                return new DataArray();
-            }
-
             float strokeWidth = roi.getStrokeWidth();
-
             FloatPolygon p = roi.getFloatPolygon();
+
             int n = p.npoints;
             float[] x = p.xpoints;
             float[] y = p.ypoints;
@@ -94,6 +95,23 @@ public class CaNIXExporter extends CaTask {
 
             return da;
         }
+
+        public DataArray saveRoiXY(Point2d[] xy, String name) {
+            final int n = xy.length;
+            double[] data = new double[2*n];
+            NDSize shape = new NDSize(new int[]{2, n});
+            DataArray da = block.createDataArray(name, "roi.xy", DataType.Float, shape);
+
+            for (int i = 0; i < n; i++) {
+                final Point2d p = xy[i];
+                data[i  ] = p.x;
+                data[i+n] = p.y;
+            }
+
+            da.setData(data, shape, new NDSize(2, 0));
+            return da;
+        }
+
 
     }
 
