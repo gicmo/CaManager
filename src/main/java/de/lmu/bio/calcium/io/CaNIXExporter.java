@@ -10,6 +10,7 @@ import ij.gui.Roi;
 
 import javax.vecmath.Point2d;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import ij.process.FloatPolygon;
 import org.g_node.nix.*;
@@ -63,6 +64,8 @@ public class CaNIXExporter extends CaTask {
             DataArray da = block.createDataArray(name + ".kymo.fg", "kymo.fg", DataType.Float, shape);
             da.setData(flat, shape, new NDSize(2, 0));
 
+            //FIXME: dimensions
+
             group.addDataArray(da);
 
             DataArray rd = saveRoiData(roi, name + ".roi.pt.fg");
@@ -87,6 +90,10 @@ public class CaNIXExporter extends CaTask {
             da.setData(x, new NDSize(new int[]{1, n}), new NDSize(new int[]{0, 0}));
             da.setData(y, new NDSize(new int[]{1, n}), new NDSize(new int[]{1, 0}));
 
+            SetDimension dm = da.appendSetDimension();
+            dm.setLabels(Arrays.asList("x", "y"));
+            SetDimension dn = da.appendSetDimension();
+
             Section root = block.getMetadata();
             Section meta = root.createSection(name, "roi");
 
@@ -109,6 +116,10 @@ public class CaNIXExporter extends CaTask {
             }
 
             da.setData(data, shape, new NDSize(2, 0));
+            SetDimension dm = da.appendSetDimension();
+            dm.setLabels(Arrays.asList("x", "y"));
+            SetDimension dn = da.appendSetDimension();
+
             return da;
         }
 
