@@ -4,6 +4,14 @@ import de.lmu.bio.calcium.tools.CaRoiCloner;
 import ij.ImagePlus;
 import ij.gui.Roi;
 import ij.io.Opener;
+import loci.common.DateTools;
+import loci.common.services.ServiceFactory;
+import loci.formats.IFormatReader;
+import loci.formats.ImageReader;
+import loci.formats.meta.IMetadata;
+import loci.formats.services.OMEXMLService;
+import ome.units.UNITS;
+import ome.units.quantity.Time;
 import org.apache.commons.io.FilenameUtils;
 
 import javax.swing.tree.TreeNode;
@@ -98,7 +106,10 @@ public class CaImage extends CaTreeNode {
     }
 
     public long getCTime() {
-        //FIXME (read from FS or image metadata)
+        if (metadata != null && metadata.ctime > 0) {
+            return metadata.ctime;
+        }
+
         return mtime;
     }
 
@@ -276,6 +287,121 @@ public class CaImage extends CaTreeNode {
         ImagePlus imp = imageOpener.openImage(getFilePath());
         nslices = imp.getNSlices();
         return imp;
+    }
+
+    /* "Metadata" */
+    private Metadata metadata;
+
+    public Metadata getMetadata() {
+        return metadata;
+    }
+
+    public Metadata getMetadata(boolean readIfNotThere) {
+        if (metadata == null && readIfNotThere) {
+            readMetadata();
+        }
+
+        return metadata;
+    }
+
+    public boolean haveMetadata() {
+        return metadata != null;
+    }
+
+
+    public class PlaneInfo {
+        public int timePoint;
+        public int channel;
+        public int focal;
+        public double deltaT;
+    }
+
+    public class Metadata {
+        public long ctime;
+
+        public PlaneInfo[] planeInfo;
+
+        public int channels;
+        public int timePoints;
+
+        public double[] ticks() {
+
+            if (planeInfo == null) {
+                return new double[0];
+            }
+
+            double[] ticks = new double[metadata.planeInfo.length];
+            for (int i = 0; i < ticks.length; i++) {
+                ticks[i] = metadata.planeInfo[i].deltaT;
+            }
+
+            return ticks;
+        }
+
+    }
+
+
+    public boolean readMetadata() {
+        metadata = new Metadata();
+
+        try {
+
+            ServiceFactory factory = new ServiceFactory();
+            OMEXMLService service = factory.getInstance(OMEXMLService.class);
+            IMetadata meta = service.createOMEXMLMetadata();
+
+            IFormatReader reader = new ImageReader();
+            reader.setMetadataStore(meta);
+            reader.setId(this.getFilePath());
+
+            //TODO: what if we have more then 1 series?
+            reader.setSeries(0);
+            final int series = reader.getSeries();
+
+            if (meta == null) {
+                return false;
+            }
+
+            metadata.channels = reader.getSizeC();
+            metadata.timePoints = reader.getSizeT();
+
+            if (meta.getImageAcquisitionDate(series) != null) {
+                String creationDate = meta.getImageAcquisitionDate(series).getValue();
+                if (creationDate != null) {
+                    metadata.ctime = DateTools.getTime(creationDate, DateTools.ISO8601_FORMAT);
+                }
+            }
+
+            final int planeCount = meta.getPlaneCount(series);
+            metadata.planeInfo = new PlaneInfo[planeCount];
+
+            // not 100% sure the logic is correct here,
+            //  seems to be for our files, but need to read the bio-formats
+            //  docs
+            for (int i = 0; i < planeCount; i++) {
+                PlaneInfo ci = metadata.planeInfo[i] = new PlaneInfo();
+
+                ci.channel = meta.getPlaneTheC(series, i).getValue();
+                ci.focal = meta.getPlaneTheZ(series, i).getValue();
+                ci.timePoint = meta.getPlaneTheT(series, i).getValue();
+
+                meta.getPlaneDeltaT(series, i);
+
+                Time deltaT = meta.getPlaneDeltaT(series, i);
+                if (deltaT == null) {
+                    continue;
+                }
+
+                ci.deltaT =  deltaT.value(UNITS.S).doubleValue();
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            metadata = null;
+            return false;
+        }
+
+        return true;
     }
 
 }

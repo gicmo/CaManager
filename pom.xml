@@ -152,6 +152,13 @@
             <version>2.0.4</version>
         </dependency>
 
+        <dependency>
+            <groupId>ome</groupId>
+            <artifactId>formats-gpl</artifactId>
+            <version>5.1.8</version>
+            <scope>compile</scope>
+        </dependency>
+
     </dependencies>
 
     <repositories>
@@ -169,6 +176,11 @@
         <repository>
             <id>imagej.snapshots</id>
             <url>http://maven.imagej.net/content/repositories/snapshots</url>
+        </repository>
+
+        <repository>
+            <id>ome.releases</id>
+            <url>http://maven.imagej.net/content/repositories/ome-releases</url>
         </repository>
 
     </repositories>
