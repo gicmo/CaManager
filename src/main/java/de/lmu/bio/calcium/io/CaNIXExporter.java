@@ -3,6 +3,7 @@ package de.lmu.bio.calcium.io;
 import de.lmu.bio.calcium.CaTask;
 import de.lmu.bio.calcium.model.CaImage;
 import de.lmu.bio.calcium.model.CaNeuron;
+import de.lmu.bio.calcium.model.CaRoiBox;
 import de.lmu.bio.calcium.tools.CaKymoGrapher;
 import ij.IJ;
 import ij.ImagePlus;
@@ -11,10 +12,10 @@ import ij.gui.Roi;
 import javax.vecmath.Point2d;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import ij.process.FloatPolygon;
 import org.g_node.nix.*;
-import sun.security.x509.DNSName;
 
 public class CaNIXExporter extends CaTask {
     private CaNeuron neuron;
@@ -41,16 +42,17 @@ public class CaNIXExporter extends CaTask {
             this.imp = imp;
         }
 
-        public boolean exportKymo(Roi roi) {
+        public boolean exportKymo(CaRoiBox roi) {
             int roiType = roi.getType();
             if (!(roiType == Roi.POLYLINE || roiType == Roi.FREELINE)) {
                 IJ.error("Unsupported ROI type.");
                 return false;
             }
 
-            String name = group.getName();
+            String prefix = group.getName();
+            String name = roi.getName().toLowerCase();
 
-            Point2d[] xy = CaKymoGrapher.roi2YX(roi);
+            Point2d[] xy = CaKymoGrapher.roi2YX(roi.getRoi());
             float width = roi.getStrokeWidth();
             float[][] data = CaKymoGrapher.createRawKymoGraph(imp, xy, width);
 
@@ -61,23 +63,27 @@ public class CaNIXExporter extends CaTask {
             NDSize shape = mkSize(data);
             float[] flat = flatten(data);
 
-            DataArray da = block.createDataArray(name + ".kymo.fg", "kymo.fg", DataType.Float, shape);
+            DataArray da = block.createDataArray(prefix + ".kymo." + name, "kymo." + name, DataType.Float, shape);
             da.setData(flat, shape, new NDSize(2, 0));
 
             //FIXME: dimensions
 
             group.addDataArray(da);
 
-            DataArray rd = saveRoiData(roi, name + ".roi.pt.fg");
+            DataArray rd = saveRoiData(roi);
             group.addDataArray(rd);
 
-            DataArray roiXY = saveRoiXY(xy, name + ".roi.xy.fg");
+            DataArray roiXY = saveRoiXY(xy, prefix + ".roi.xy." + name, "roi.xy." + name);
             group.addDataArray(roiXY);
 
             return true;
         }
 
-        public DataArray saveRoiData(Roi roi, String name) {
+        public DataArray saveRoiData(CaRoiBox roi) {
+
+            String type = "roi.pt." + roi.getName().toLowerCase();
+            String name = group.getName() + type;
+
             int roiType = roi.getType();
             float strokeWidth = roi.getStrokeWidth();
             FloatPolygon p = roi.getFloatPolygon();
@@ -86,7 +92,7 @@ public class CaNIXExporter extends CaTask {
             float[] x = p.xpoints;
             float[] y = p.ypoints;
 
-            DataArray da = block.createDataArray(name, "roi.coordinates", DataType.Float, new NDSize(new int[]{2, n}));
+            DataArray da = block.createDataArray(name, type, DataType.Float, new NDSize(new int[]{2, n}));
             da.setData(x, new NDSize(new int[]{1, n}), new NDSize(new int[]{0, 0}));
             da.setData(y, new NDSize(new int[]{1, n}), new NDSize(new int[]{1, 0}));
 
@@ -103,11 +109,11 @@ public class CaNIXExporter extends CaTask {
             return da;
         }
 
-        public DataArray saveRoiXY(Point2d[] xy, String name) {
+        public DataArray saveRoiXY(Point2d[] xy, String name, String type) {
             final int n = xy.length;
             double[] data = new double[2*n];
             NDSize shape = new NDSize(new int[]{2, n});
-            DataArray da = block.createDataArray(name, "roi.xy", DataType.Float, shape);
+            DataArray da = block.createDataArray(name, type, DataType.Float, shape);
 
             for (int i = 0; i < n; i++) {
                 final Point2d p = xy[i];
@@ -188,13 +194,16 @@ public class CaNIXExporter extends CaTask {
             g.setMetadata(im);
 
             ImagePlus ip = IJ.openImage(img.getFilePath());
-            Roi roi = img.getRoiFg();
-            if (roi == null) {
+
+            if (ip == null) {
+                IJ.error("Could not open Image: " + name);
                 continue;
             }
 
+            List<CaRoiBox> rois = img.listRois();
+
             KymoExporter exporter = new KymoExporter(b, g, ip);
-            exporter.exportKymo(roi);
+            rois.forEach(exporter::exportKymo);
 
         }
 
