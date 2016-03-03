@@ -32,11 +32,13 @@ public class CaNIXExporter extends CaTask {
     //
 
     class KymoExporter {
+        private CaImage img;
         private Block block;
         private Group group;
         private ImagePlus imp;
 
-        public KymoExporter(Block block, Group g, ImagePlus imp) {
+        public KymoExporter(CaImage img, Block block, Group g, ImagePlus imp) {
+            this.img = img;
             this.block = block;
             this.group = g;
             this.imp = imp;
@@ -66,7 +68,17 @@ public class CaNIXExporter extends CaTask {
             DataArray da = block.createDataArray(prefix + ".kymo." + name, "kymo." + name, DataType.Float, shape);
             da.setData(flat, shape, new NDSize(2, 0));
 
-            //FIXME: dimensions
+            CaImage.Metadata metadata = img.getMetadata();
+
+            boolean correctMetadata =
+                    metadata != null &&
+                    metadata.planeInfo != null &&
+                    metadata.planeInfo.length == data[0].length;
+
+            if (correctMetadata) {
+                da.appendRangeDimension(metadata.ticks());
+                da.appendSetDimension();
+            }
 
             group.addDataArray(da);
 
@@ -190,8 +202,26 @@ public class CaNIXExporter extends CaTask {
             Group g = b.createGroup(name, "image.ca");
 
             Section im = meta.createSection(name, "image.ca");
-            im.createProperty("creation_time", new Value(img.getCTime()));
             g.setMetadata(im);
+
+            im.createProperty("creation_time", new Value(img.getCTime()));
+
+            CaImage.Metadata metadata = img.getMetadata(true);
+            if (metadata != null) {
+                im.createProperty("channels", new Value(metadata.channels));
+
+                int n = metadata.planeInfo.length;
+                NDSize shape = new NDSize(new int[]{n});
+                DataArray cd = b.createDataArray(name + ".channels", "channel", DataType.Int8, shape);
+                int[] ci = new int[n];
+                for (int i = 0; i < n; i++) {
+                    ci[i] = metadata.planeInfo[i].channel;
+                }
+                cd.setData(ci, shape, new NDSize(new int[]{0}));
+                cd.appendRangeDimension(metadata.ticks());
+
+                g.addDataArray(cd);
+            }
 
             ImagePlus ip = IJ.openImage(img.getFilePath());
 
@@ -202,7 +232,7 @@ public class CaNIXExporter extends CaTask {
 
             List<CaRoiBox> rois = img.listRois();
 
-            KymoExporter exporter = new KymoExporter(b, g, ip);
+            KymoExporter exporter = new KymoExporter(img, b, g, ip);
             rois.forEach(exporter::exportKymo);
 
         }
