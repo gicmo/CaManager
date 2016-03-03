@@ -9,6 +9,7 @@ import org.apache.commons.io.FilenameUtils;
 import javax.swing.tree.TreeNode;
 import java.awt.*;
 import java.io.File;
+import java.util.ArrayList;
 
 public class CaImage extends CaTreeNode {
 
@@ -143,6 +144,21 @@ public class CaImage extends CaTreeNode {
         }
 
         return result;
+    }
+
+    public java.util.List<CaRoiBox> listRois() {
+        ArrayList<CaRoiBox> roiList = new ArrayList<CaRoiBox>();
+        for (Object child : children) {
+            if (!(child instanceof  CaRoiBox)) {
+                continue;
+            }
+
+            CaRoiBox roi = (CaRoiBox) child;
+
+            roiList.add(roi);
+        }
+
+        return roiList;
     }
 
     public int getRoiCount() {
