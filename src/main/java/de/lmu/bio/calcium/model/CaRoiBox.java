@@ -7,7 +7,7 @@ public class CaRoiBox extends CaTreeNode {
 
     private Roi roi;
 
-    CaRoiBox(Roi roi) {
+    public CaRoiBox(Roi roi) {
         this.roi = roi;
     }
 
