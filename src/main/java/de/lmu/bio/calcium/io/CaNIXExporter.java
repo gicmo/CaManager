@@ -20,8 +20,15 @@ import org.g_node.nix.*;
 public class CaNIXExporter extends CaTask {
     private CaNeuron neuron;
     private String path;
+
+    //progress bookkeeping
     protected int imagesTotal = 0;
     protected int imageProcessed = 0;
+
+    //nix global
+    File  nixfd;
+    Block block;
+    Section meta;
 
     public CaNIXExporter(String path, CaNeuron neuron) {
         super("Exporting to NIX @ " + path);
@@ -29,17 +36,13 @@ public class CaNIXExporter extends CaTask {
         this.path = path;
     }
 
-    //
-
     class KymoExporter {
         private CaImage img;
-        private Block block;
         private Group group;
         private ImagePlus imp;
 
-        public KymoExporter(CaImage img, Block block, Group g, ImagePlus imp) {
+        public KymoExporter(CaImage img, Group g, ImagePlus imp) {
             this.img = img;
-            this.block = block;
             this.group = g;
             this.imp = imp;
         }
@@ -164,18 +167,61 @@ public class CaNIXExporter extends CaTask {
         return new NDSize(new int[]{data.length, data[0].length});
     }
 
+    private void exportImage(CaImage img) {
+        String name = img.getName();
+
+        fireTaskProgress(imageProcessed, imagesTotal, "Exporting image " + name);
+
+        Group g = block.createGroup(name, "image.ca");
+        Section im = meta.createSection(name, "image.ca");
+        g.setMetadata(im);
+
+        im.createProperty("creation_time", new Value(img.getCTime()));
+
+        CaImage.Metadata metadata = img.getMetadata(true);
+        if (metadata != null) {
+            im.createProperty("channels", new Value(metadata.channels));
+
+            int n = metadata.planeInfo.length;
+            NDSize shape = new NDSize(new int[]{n});
+            DataArray cd = block.createDataArray(name + ".channels", "channel", DataType.Int8, shape);
+            int[] ci = new int[n];
+            for (int i = 0; i < n; i++) {
+                ci[i] = metadata.planeInfo[i].channel;
+            }
+            cd.setData(ci, shape, new NDSize(new int[]{0}));
+            cd.appendRangeDimension(metadata.ticks());
+
+            g.addDataArray(cd);
+        }
+
+        ImagePlus ip = IJ.openImage(img.getFilePath());
+
+        if (ip == null) {
+            IJ.error("Could not open Image: " + name);
+            return;
+        }
+
+        List<CaRoiBox> rois = img.listRois();
+
+        KymoExporter exporter = new KymoExporter(img, g, ip);
+        rois.forEach(exporter::exportKymo);
+
+        imageProcessed++;
+    }
+
     @Override
     public void runTask() throws Exception {
         fireTaskProgress(imageProcessed, imagesTotal, "Starting export...");
 
-        File fd = File.open(path, FileMode.Overwrite);
+        nixfd = File.open(path, FileMode.Overwrite);
 
         // everything will be on that block
-        Block b = fd.createBlock(neuron.getName(), "neuron");
+        block = nixfd.createBlock(neuron.getName(), "neuron");
 
         // save the per-neuron metadata
-        Section meta = fd.createSection(neuron.getName(), "neuron");
-        b.setMetadata(meta);
+        meta = nixfd.createSection(neuron.getName(), "neuron");
+        block.setMetadata(meta);
 
         String value;
         if ((value = neuron.getComment()) != null) {
@@ -194,54 +240,12 @@ public class CaNIXExporter extends CaTask {
         ArrayList<CaImage> images = neuron.getImages(true);
         imagesTotal = images.size();
 
-        for (CaImage img : images) {
-            String name = img.getName();
+        images.forEach(this::exportImage);
 
-            fireTaskProgress(imageProcessed, imagesTotal, "Exporting image " + name);
-
-            Group g = b.createGroup(name, "image.ca");
-
-            Section im = meta.createSection(name, "image.ca");
-            g.setMetadata(im);
-
-            im.createProperty("creation_time", new Value(img.getCTime()));
-
-            CaImage.Metadata metadata = img.getMetadata(true);
-            if (metadata != null) {
-                im.createProperty("channels", new Value(metadata.channels));
-
-                int n = metadata.planeInfo.length;
-                NDSize shape = new NDSize(new int[]{n});
-                DataArray cd = b.createDataArray(name + ".channels", "channel", DataType.Int8, shape);
-                int[] ci = new int[n];
-                for (int i = 0; i < n; i++) {
-                    ci[i] = metadata.planeInfo[i].channel;
-                }
-                cd.setData(ci, shape, new NDSize(new int[]{0}));
-                cd.appendRangeDimension(metadata.ticks());
-
-                g.addDataArray(cd);
-            }
-
-            ImagePlus ip = IJ.openImage(img.getFilePath());
-
-            if (ip == null) {
-                IJ.error("Could not open Image: " + name);
-                continue;
-            }
-
-            List<CaRoiBox> rois = img.listRois();
-
-            KymoExporter exporter = new KymoExporter(img, b, g, ip);
-            rois.forEach(exporter::exportKymo);
-
-        }
-
-        fd.close();
+        meta.close();
+        block.close();
+        nixfd.close();
     }
-
-
-
 
 }
 
