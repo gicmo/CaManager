@@ -42,10 +42,13 @@ class CaNIXImporter(val path: String)
     
     imageGroups.map { g ->
       importImage(g)
+    }.sortedBy{
+      i -> i.name.toInt()
     }.forEach { i ->
       theNeuron?.add(i)
     }
 
+    imageGroups.forEach { g -> g.close() }
     block.close()
     fd.close()
   }
@@ -105,6 +108,8 @@ class CaNIXImporter(val path: String)
 
       CaRoiBox(roi)
     }.forEach { roi -> img.add(roi) }
+    meta.close()
+    chans.close()
 
     imagesProcessed++
     return img
