@@ -21,12 +21,25 @@ class CaNIXImporter(val path: String)
   override fun runTask() {
     val fd = File.open(path, FileMode.ReadOnly)
     val block = fd.getBlocks{ b -> b.type == "neuron" }.lastOrNull() ?: throw RuntimeException("No neuron in file")
+    val meta = block.metadata
 
     theNeuron = CaNeuron(block.name)
 
+    if (meta.hasProperty("region")) {
+      theNeuron?.region = meta.getProperty("region").values[0].string
+    }
+
+    if (meta.hasProperty("age")) {
+      theNeuron?.region = meta.getProperty("age").values[0].string
+    }
+
+    if (meta.hasProperty("comment")) {
+      theNeuron?.comment = meta.getProperty("comment").values[0].string
+    }
+
     var imageGroups = block.getGroups { g -> g.type == "image.ca"}
     imagesTotal = imageGroups.count()
-
+    
     imageGroups.map { g ->
       importImage(g)
     }.forEach { i ->
@@ -70,6 +83,7 @@ class CaNIXImporter(val path: String)
     })
 
     img.metadata = md
+    img.metadata.timePoints = md.planeInfo.size
 
     var roiData = parent.getDataArrays {
       d -> d.type.startsWith("roi.pt", true)
