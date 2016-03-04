@@ -279,7 +279,9 @@ public class CaImage extends CaTreeNode {
         Opener imageOpener = new Opener();
         imageOpener.setSilentMode(true);
         ImagePlus imp = imageOpener.openImage(getFilePath());
-        nslices = imp.getNSlices();
+        if (imp != null) {
+            nslices = imp.getNSlices();
+        }
         readMetadata();
         return imp;
     }
