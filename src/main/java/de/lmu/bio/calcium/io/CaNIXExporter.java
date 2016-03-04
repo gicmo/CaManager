@@ -198,6 +198,7 @@ public class CaNIXExporter extends CaTask {
         ImagePlus ip = IJ.openImage(img.getFilePath());
 
         if (ip == null) {
+            imageProcessed++;
             IJ.error("Could not open Image: " + name);
             return;
         }
@@ -224,16 +225,15 @@ public class CaNIXExporter extends CaTask {
         block.setMetadata(meta);
 
         String value;
-        if ((value = neuron.getComment()) != null) {
+        if ((value = neuron.getComment()) != null && value.length() > 0) {
             meta.createProperty("comment", new Value(value));
         }
 
-        //FIXME: convert to string
-        //if ((value = neuron.getAge()) != null) {
-        //    meta.createProperty("age", new Value(value));
-        //}
+        if ((value = neuron.getAge()) != null && value.length() > 0) {
+            meta.createProperty("age", new Value(value));
+        }
 
-        if ((value = neuron.getRegion()) != null) {
+        if ((value = neuron.getRegion()) != null && value.length() > 0) {
             meta.createProperty("region", new Value(value));
         }
 
