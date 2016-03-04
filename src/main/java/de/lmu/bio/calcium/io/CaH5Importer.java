@@ -1,6 +1,5 @@
 package de.lmu.bio.calcium.io;
 
-import de.lmu.bio.calcium.CaTask;
 import de.lmu.bio.calcium.model.CaGroup;
 import de.lmu.bio.calcium.model.CaImage;
 import de.lmu.bio.calcium.model.CaNeuron;
@@ -13,7 +12,7 @@ import ncsa.hdf.object.h5.H5File;
 import java.io.File;
 import java.util.*;
 
-public class CaH5Importer extends CaTask {
+public class CaH5Importer extends CaImporter {
     private H5File h5;
     private String path;
     private File pathPrefix = null;
@@ -44,6 +43,7 @@ public class CaH5Importer extends CaTask {
         close(); //make sure file is always closed by catching any exception and rethrowing it
     }
 
+    @Override
     public CaNeuron getNeuron() {
         return neuron;
     }
