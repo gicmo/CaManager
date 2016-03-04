@@ -79,6 +79,8 @@ public class CaImage extends CaTreeNode {
         return file.getAbsolutePath();
     }
 
+    public String getFileName() { return file.getName(); }
+
     public File getFile() {
         return file;
     }
