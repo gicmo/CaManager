@@ -70,6 +70,7 @@ public class CaNIXExporter extends CaTask {
 
             DataArray da = block.createDataArray(prefix + ".kymo." + name, "kymo." + name, DataType.Float, shape);
             da.setData(flat, shape, new NDSize(2, 0));
+            da.setLabel("calcium signal");
 
             CaImage.Metadata metadata = img.getMetadata();
 
@@ -79,7 +80,9 @@ public class CaNIXExporter extends CaTask {
                     metadata.planeInfo.length == data[0].length;
 
             if (correctMetadata) {
-                da.appendRangeDimension(metadata.ticks());
+                RangeDimension dim = da.appendRangeDimension(metadata.ticks());
+                dim.setUnit("s");
+                dim.setLabel("time");
                 da.appendSetDimension();
             }
 
@@ -194,7 +197,10 @@ public class CaNIXExporter extends CaTask {
                 ci[i] = metadata.planeInfo[i].channel;
             }
             cd.setData(ci, shape, new NDSize(new int[]{0}));
-            cd.appendRangeDimension(metadata.ticks());
+            cd.setLabel("channel");
+            RangeDimension dim = cd.appendRangeDimension(metadata.ticks());
+            dim.setLabel("time");
+            dim.setUnit("s");
 
             g.addDataArray(cd);
         }
