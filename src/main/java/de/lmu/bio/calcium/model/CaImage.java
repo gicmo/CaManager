@@ -185,7 +185,7 @@ public class CaImage extends CaTreeNode {
         return (int) ol.stream().filter(o -> o instanceof CaRoiBox).count();
     }
 
-    private void setRoi(Roi value, String name) {
+    public void setRoi(Roi value, String name) {
         CaRoiBox box = getRoiBox(name);
 
         if (value != null) {
