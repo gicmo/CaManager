@@ -97,7 +97,7 @@ public class CaNIXExporter extends CaTask {
         public DataArray saveRoiData(CaRoiBox roi) {
 
             String type = "roi.pt." + roi.getName().toLowerCase();
-            String name = group.getName() + type;
+            String name = group.getName() + "." + type;
 
             int roiType = roi.getType();
             float strokeWidth = roi.getStrokeWidth();
