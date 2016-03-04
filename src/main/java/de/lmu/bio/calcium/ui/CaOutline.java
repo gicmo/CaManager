@@ -168,7 +168,7 @@ public class CaOutline extends Outline implements MouseListener {
             CaImage image = (CaImage) o;
 
             if (i == 0) {
-                long mtime = image.getMTime();
+                long mtime = image.getCTime();
                 SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
                 Date date = new Date(mtime);
                 return sdf.format(date);
@@ -232,7 +232,7 @@ public class CaOutline extends Outline implements MouseListener {
         @Override
         public String getColumnName(int i) {
             if (i == 0)
-                return "M-Time";
+                return "Time";
             else if (i == 1)
                 return "Trial";
             else if (i == 2)
