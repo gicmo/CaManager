@@ -168,7 +168,7 @@ public class CaImage extends CaTreeNode {
 
         AbstractList<?> ol = (AbstractList<?>) children;
 
-       return ol.stream()
+        return ol.stream()
                 .filter(o -> o instanceof CaRoiBox)
                 .map(b -> (CaRoiBox) b)
                 .collect(Collectors.toCollection(ArrayList<CaRoiBox>::new));

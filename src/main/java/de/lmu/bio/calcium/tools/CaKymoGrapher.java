@@ -79,7 +79,7 @@ public class CaKymoGrapher {
     // heavily based on ij.gui.ProfilePlot
     public static Point2d[] roi2YX(Roi roi) {
         if (roi == null) {
-            IJ.error("KymoGraph", "Selction required.");
+            IJ.error("KymoGraph", "Selection required.");
             return null;
         }
 
