@@ -44,7 +44,6 @@ public class CaImage extends CaTreeNode {
         mtime = file.lastModified();
         String filename = file.getName();
         setName(filename);
-
     }
 
     private void setName(String filename) {
@@ -301,6 +300,11 @@ public class CaImage extends CaTreeNode {
         }
 
         return metadata;
+    }
+
+    // Should probably only be used by the Importers
+    public void setMetadata(Metadata md) {
+        metadata = md;
     }
 
     public boolean haveMetadata() {
