@@ -1,8 +1,7 @@
 package de.lmu.bio.calcium.ui;
 
 import de.lmu.bio.calcium.*;
-import de.lmu.bio.calcium.io.CaH5Exporter;
-import de.lmu.bio.calcium.io.CaH5Importer;
+import de.lmu.bio.calcium.io.*;
 import de.lmu.bio.calcium.model.CaImage;
 import de.lmu.bio.calcium.model.CaNeuron;
 import de.lmu.bio.calcium.model.CaRoiBox;
@@ -16,6 +15,7 @@ import ij.*;
 import ij.gui.GenericDialog;
 import ij.gui.ImageWindow;
 import ij.gui.Roi;
+import ij.io.OpenDialog;
 import ij.process.FloatProcessor;
 import org.netbeans.swing.outline.OutlineModel;
 
@@ -244,30 +244,39 @@ public class CaNeuronWindow extends JFrame implements CaOutline.Delegate, ImageL
     public void save() {
 
         CaNeuron neuron = getNeuron();
-        String filename = neuron.getName() + ".h5";
+        String filename = neuron.getName() + ".nix";
 
-        JFileChooser fileChooser = new JFileChooser();
-        fileChooser.setMultiSelectionEnabled(false);
-        fileChooser.setDialogTitle("Save File");
+        FileDialog fd = new FileDialog(this, "Save Neuron", FileDialog.SAVE);
+        fd.setMultipleMode(false);
+        String path = settings.getDataDir().getAbsolutePath();
 
-        File selection = new File(settings.getDataDir(), filename);
-        fileChooser.setSelectedFile(selection);
-        fileChooser.setToolTipText("Select the location where to save the file");
-        FileNameExtensionFilter filter = new FileNameExtensionFilter(
-                "HDF5 File", "h5", "hdf5");
-        fileChooser.setFileFilter(filter);
-
-
-        int ret = fileChooser.showSaveDialog(this);
-
-        if (ret != JFileChooser.APPROVE_OPTION) {
-            return;
+        if (!new java.io.File(path).exists()) {
+            path = OpenDialog.getLastDirectory();
         }
 
-        try {
+        fd.setFile(filename);
+        fd.setDirectory(path);
+        fd.setFilenameFilter((dir, name) -> name.endsWith(".nix"));
 
+        fd.setVisible(true);
+
+        File[] ret = fd.getFiles();
+        if (ret == null || ret.length == 0)
+            return;
+
+        path = ret[0].getAbsolutePath();
+
+        try {
             startTask();
-            CaH5Exporter exporter = new CaH5Exporter(fileChooser.getSelectedFile().getAbsolutePath(), neuron);
+
+            CaTask exporter;
+
+            if (path.endsWith(".hdf5")) {
+                exporter = new CaNIXExporter(path, neuron);
+            } else {
+                exporter = new CaNIXExporter(path, neuron);
+            }
+
             CaProgressDialog dlg = new CaProgressDialog(exporter);
             exporter.start();
             dlg.setLocationRelativeTo(this);
@@ -275,8 +284,8 @@ public class CaNeuronWindow extends JFrame implements CaOutline.Delegate, ImageL
             finishTask(exporter); //FIXME exception
 
         } catch (Exception e) {
-            System.err.println(e.getStackTrace().toString());
-            IJ.log(e.getStackTrace().toString());
+            e.printStackTrace();
+            //IJ.log(e.getStackTrace().toString());
         }
     }
 
@@ -296,7 +305,14 @@ public class CaNeuronWindow extends JFrame implements CaOutline.Delegate, ImageL
 
         String path = ret[0].getAbsolutePath();
 
-        CaH5Importer importer = new CaH5Importer(path);
+        CaImporter importer;
+
+        if (path.endsWith("h5") || path.endsWith(".hdf5")) {
+            importer = new CaH5Importer(path);
+        } else {
+            importer = new CaNIXImporter(path);
+        }
+
         startTask();
         CaProgressDialog dlg = new CaProgressDialog(importer);
         importer.start();
