@@ -51,7 +51,7 @@ public class CaNeuronEditor extends JDialog {
 
         this.neuron = neuron;
         name.setText(neuron.getName());
-        age.setText(Double.toString(neuron.getAge()));
+        age.setText(neuron.getAge());
         pack();
     }
 

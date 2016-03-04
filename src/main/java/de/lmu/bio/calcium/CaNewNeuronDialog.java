@@ -118,12 +118,8 @@ public class CaNewNeuronDialog extends JDialog {
         neuron.setCommonFilePrefix(tfPrefix.getText());
         neuron.setRegion(cbRegion.getSelectedItem().toString());
         neuron.setSex (cbSex.getSelectedItem().toString());
-        Object ageString = cbSex.getSelectedItem().toString();
-        if (!ageString.equals("")) {
-            double age = Double.parseDouble(ageString.toString());
-            neuron.setAge(age);
+        neuron.setAge(cbSex.getSelectedItem().toString());
 
-        }
         for (File f : files) {
             CaImage image = new CaImage(f.getAbsolutePath());
             neuron.add(image);

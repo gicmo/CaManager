@@ -6,7 +6,7 @@ import java.util.Comparator;
 import java.util.Enumeration;
 
 public class CaNeuron extends CaGroup {
-    private double age;
+    private String age;
     private String comment;
     private String region;
     private String commonFilePrefix;
@@ -24,11 +24,11 @@ public class CaNeuron extends CaGroup {
         setUserObject(value);
     }
 
-    public double getAge() {
+    public String getAge() {
         return age;
     }
 
-    public void setAge(double age) {
+    public void setAge(String age) {
         this.age = age;
     }
 
