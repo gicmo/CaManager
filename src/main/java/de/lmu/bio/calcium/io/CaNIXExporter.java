@@ -121,6 +121,8 @@ public class CaNIXExporter extends CaTask {
             meta.createProperty("type", new Value(roiType));
             meta.createProperty("strokeWidth", new Value(strokeWidth));
 
+            da.setMetadata(meta);
+
             return da;
         }
 
