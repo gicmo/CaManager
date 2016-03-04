@@ -17,7 +17,10 @@ import org.apache.commons.io.FilenameUtils;
 import javax.swing.tree.TreeNode;
 import java.awt.*;
 import java.io.File;
+import java.util.AbstractList;
 import java.util.ArrayList;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class CaImage extends CaTreeNode {
 
@@ -158,36 +161,27 @@ public class CaImage extends CaTreeNode {
     }
 
     public java.util.List<CaRoiBox> listRois() {
-        ArrayList<CaRoiBox> roiList = new ArrayList<CaRoiBox>();
-        for (Object child : children) {
-            if (!(child instanceof  CaRoiBox)) {
-                continue;
-            }
 
-            CaRoiBox roi = (CaRoiBox) child;
-
-            roiList.add(roi);
+        if (children == null) {
+            return new ArrayList<>();
         }
 
-        return roiList;
+        AbstractList<?> ol = (AbstractList<?>) children;
+
+       return ol.stream()
+                .filter(o -> o instanceof CaRoiBox)
+                .map(b -> (CaRoiBox) b)
+                .collect(Collectors.toCollection(ArrayList<CaRoiBox>::new));
     }
 
     public int getRoiCount() {
-        int count = 0;
 
         if (children == null) {
-            return count;
+            return 0;
         }
 
-        for (Object child : children) {
-            if (!(child instanceof CaRoiBox)) {
-                continue;
-            }
-
-            count++;
-        }
-
-        return count;
+        AbstractList<?> ol = (AbstractList<?>) children;
+        return (int) ol.stream().filter(o -> o instanceof CaRoiBox).count();
     }
 
     private void setRoi(Roi value, String name) {
@@ -286,6 +280,7 @@ public class CaImage extends CaTreeNode {
         imageOpener.setSilentMode(true);
         ImagePlus imp = imageOpener.openImage(getFilePath());
         nslices = imp.getNSlices();
+        readMetadata();
         return imp;
     }
 
