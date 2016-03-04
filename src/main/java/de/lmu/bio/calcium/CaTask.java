@@ -1,8 +1,10 @@
 package de.lmu.bio.calcium;
 
+import ij.IJ;
+
 import java.util.ArrayList;
 
-public class CaTask extends Thread  {
+public abstract class CaTask extends Thread  {
 
     protected boolean success;
     protected Exception error;
@@ -32,9 +34,7 @@ public class CaTask extends Thread  {
             observer.taskProgress(itemsProcessed, ofTotalItems, message);
         }
     }
-    protected void runTask() throws Exception {
-
-    }
+    protected abstract void runTask() throws Exception;
 
     @Override
     public void run() {
@@ -46,6 +46,7 @@ public class CaTask extends Thread  {
             runTask();
         } catch (Exception e) {
             error = e;
+            IJ.error(e.getMessage());
             e.printStackTrace();
             success = false;
         }
