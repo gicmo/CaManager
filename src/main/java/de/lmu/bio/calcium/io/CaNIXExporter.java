@@ -22,13 +22,13 @@ public class CaNIXExporter extends CaTask {
     private String path;
 
     //progress bookkeeping
-    protected int imagesTotal = 0;
-    protected int imageProcessed = 0;
+    private int imagesTotal = 0;
+    private int imageProcessed = 0;
 
     //nix global
-    File  nixfd;
-    Block block;
-    Section meta;
+    private File  nixfd;
+    private Block block;
+    private Section meta;
 
     public CaNIXExporter(String path, CaNeuron neuron) {
         super("Exporting to NIX @ " + path);
@@ -36,18 +36,18 @@ public class CaNIXExporter extends CaTask {
         this.path = path;
     }
 
-    class KymoExporter {
+    private class KymoExporter {
         private CaImage img;
         private Group group;
         private ImagePlus imp;
 
-        public KymoExporter(CaImage img, Group g, ImagePlus imp) {
+        KymoExporter(CaImage img, Group g, ImagePlus imp) {
             this.img = img;
             this.group = g;
             this.imp = imp;
         }
 
-        public boolean exportKymo(CaRoiBox roi) {
+        boolean exportKymo(CaRoiBox roi) {
             int roiType = roi.getType();
             if (!(roiType == Roi.POLYLINE || roiType == Roi.FREELINE)) {
                 IJ.error("Unsupported ROI type.");
@@ -97,7 +97,7 @@ public class CaNIXExporter extends CaTask {
             return true;
         }
 
-        public DataArray saveRoiData(CaRoiBox roi) {
+        DataArray saveRoiData(CaRoiBox roi) {
 
             String type = "roi.pt." + roi.getName().toLowerCase();
             String name = group.getName() + "." + type;
@@ -129,7 +129,7 @@ public class CaNIXExporter extends CaTask {
             return da;
         }
 
-        public DataArray saveRoiXY(Point2d[] xy, String name, String type) {
+        DataArray saveRoiXY(Point2d[] xy, String name, String type) {
             final int n = xy.length;
             double[] data = new double[2*n];
             NDSize shape = new NDSize(new int[]{2, n});
@@ -152,7 +152,7 @@ public class CaNIXExporter extends CaTask {
 
     }
 
-    static float[] flatten(float[][] data) {
+    private static float[] flatten(float[][] data) {
         int m = data.length;
         int n = data[0].length;
 
@@ -164,7 +164,7 @@ public class CaNIXExporter extends CaTask {
         return flat;
     }
 
-    static NDSize mkSize(float[][] data) {
+    private static NDSize mkSize(float[][] data) {
         if (data == null) {
             return new NDSize();
         }
