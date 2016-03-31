@@ -42,7 +42,7 @@ class CaNIXImporter(val path: String)
     
     imageGroups.map { g ->
       importImage(g)
-    }.sortedBy{
+    }.sortedBy {
       i -> i.name.toInt()
     }.forEach { i ->
       theNeuron?.add(i)
