@@ -222,14 +222,19 @@ public class CaNewNeuronDialog extends JDialog {
         if (!init)
             return;
 
-        //Set the neuron name based on the date
+
         String name = tfName.getName();
         if (name == null || name.length() == 0) {
-            long lm = files[0].lastModified();
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-            Date date = new Date(lm);
-            name = sdf.format(date);
-            tfName.setText(name);
+            //Set the neuron name based on the date
+            if (CaSettings.get().getMakeNameFromFolder()) {
+                tfName.setText(files[0].getParentFile().getName());
+            } else {
+                long lm = files[0].lastModified();
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+                Date date = new Date(lm);
+                name = sdf.format(date);
+                tfName.setText(name);
+            }
         }
 
         //Set the common file prefix

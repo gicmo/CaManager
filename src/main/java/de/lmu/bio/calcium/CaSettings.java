@@ -48,4 +48,13 @@ public class CaSettings {
         String value = template != null ? template.getName() : "";
         prefs.put("DefaultTemplate", value);
     }
+
+    public boolean getMakeNameFromFolder() {
+        String s = prefs.get("MakeNameFromFolder", "1");
+        return Integer.parseInt(s) != 0;
+    }
+
+    public void setMakeNameFromFolder(boolean yes) {
+        prefs.put("MakeNameFromFolder", String.valueOf(yes ? 1 : 0));
+    }
 }
