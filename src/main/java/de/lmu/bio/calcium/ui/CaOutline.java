@@ -145,13 +145,40 @@ public class CaOutline extends Outline implements MouseListener {
 
     //------------------------------------------------------------------------------------------------------------------
     public interface Delegate {
-        public void doubleClicked(int row, Object object);
-        public void popupTriggered(CaOutline outline, Point p);
+        void doubleClicked(int row, Object object);
+        void popupTriggered(CaOutline outline, Point p);
     }
 
 
     //------------------------------------------------------------------------------------------------------------------
     public static class CaOutlineRowModel implements RowModel {
+
+        private enum Column {
+            Time(0, "Time", false),
+            Trial(1, "Trial", true),
+            Slices(2, "Slices", false),
+            Drift(3, "Drift", false),
+            ROILength(4, "ROI Length", false);
+
+            public final int id;
+            public final String name;
+            public final boolean editable;
+            Column(int id, String name, boolean editable) {
+                this.id = id;
+                this.name = name;
+                this.editable = editable;
+            }
+
+            public static Column fromInt(int id) {
+                for(Column r : Column.values()) {
+                    if (r.id == id) {
+                        return r;
+                    }
+                }
+
+                throw new RuntimeException("Invalid key for row " + id);
+            }
+        }
 
         @Override
         public int getColumnCount() {
@@ -167,37 +194,43 @@ public class CaOutline extends Outline implements MouseListener {
 
             CaImage image = (CaImage) o;
 
-            if (i == 0) {
-                long mtime = image.getCTime();
-                SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
-                Date date = new Date(mtime);
-                return sdf.format(date);
-            } else if (i == 1) {
-                int trail = image.getTrial();
-                return Integer.toString(trail);
-            } else if (i == 2) {
-                int slices = image.getNslices();
-                if (slices < 0) {
-                    return "";
-                }
-                return Integer.toString(slices);
-            } else if (i == 3) {
-                Point drift = image.getDrift();
-                if (drift == null) {
-                    return "";
-                }
+            Column r = Column.fromInt(i);
 
-                double len = Math.hypot(drift.x, drift.y);
-                return IJ.d2s(len);
+            switch (r) {
+                case Time:
+                    long mtime = image.getCTime();
+                    SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+                    Date date = new Date(mtime);
+                    return sdf.format(date);
 
-            } else if (i == 4) {
-                Roi roi = image.getRoiFg();
-                //double len = de.lmu.bio.calcium.model.CaImage.getRoiLength(roi, null);
-                double len = 0;
-                if (roi != null) {
-                    len = roi.getLength();
-                }
-                return len > 0 ? IJ.d2s(len) : "";
+                case Trial:
+                    int trail = image.getTrial();
+                    return Integer.toString(trail);
+
+                case Slices:
+                    int slices = image.getNslices();
+                    if (slices < 0) {
+                        return "";
+                    }
+                    return Integer.toString(slices);
+
+                case Drift:
+                    Point drift = image.getDrift();
+                    if (drift == null) {
+                        return "";
+                    }
+
+                    double len = Math.hypot(drift.x, drift.y);
+                    return IJ.d2s(len);
+
+                case ROILength:
+                    Roi roi = image.getRoiFg();
+                    //double len = de.lmu.bio.calcium.model.CaImage.getRoiLength(roi, null);
+                    len = 0;
+                    if (roi != null) {
+                        len = roi.getLength();
+                    }
+                    return len > 0 ? IJ.d2s(len) : "";
             }
 
             return "";
@@ -210,15 +243,12 @@ public class CaOutline extends Outline implements MouseListener {
 
         @Override
         public boolean isCellEditable(Object o, int i) {
-            if (o instanceof CaImage && i == 1) {
-                return true;
-            }
-            return false;
+            return o instanceof CaImage && Column.fromInt(i).editable;
         }
 
         @Override
         public void setValueFor(Object o, int i, Object o1) {
-            if (i == 1) {
+            if (Column.fromInt(i) == Column.Trial) {
                 if (!(o1 instanceof String) || !(o instanceof CaImage)) {
                     return;
                 }
@@ -231,18 +261,7 @@ public class CaOutline extends Outline implements MouseListener {
 
         @Override
         public String getColumnName(int i) {
-            if (i == 0)
-                return "Time";
-            else if (i == 1)
-                return "Trial";
-            else if (i == 2)
-                return "Slices";
-            else if (i == 3)
-                return "Drift";
-            else if (i == 4)
-                return "ROI Length";
-
-            return "";
+            return Column.fromInt(i).name;
         }
     }
     //
