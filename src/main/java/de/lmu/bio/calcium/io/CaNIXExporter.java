@@ -184,6 +184,8 @@ public class CaNIXExporter extends CaTask {
         im.createProperty("creation_time", new Value(img.getCTime()));
         im.createProperty("original_path", new Value(img.getFilePath()));
         im.createProperty("filename", new Value(img.getFileName()));
+        im.createProperty("trial", new Value(img.getTrial()));
+        im.createProperty("condition", new Value(img.getCondition()));
 
         CaImage.Metadata metadata = img.getMetadata(true);
         if (metadata != null) {

@@ -156,9 +156,10 @@ public class CaOutline extends Outline implements MouseListener {
         private enum Column {
             Time(0, "Time", false),
             Trial(1, "Trial", true),
-            Slices(2, "Slices", false),
-            Drift(3, "Drift", false),
-            ROILength(4, "ROI Length", false);
+            Condition(2, "Condition", true),
+            Slices(3, "Slices", false),
+            Drift(4, "Drift", false),
+            ROILength(5, "ROI Length", false);
 
             public final int id;
             public final String name;
@@ -207,6 +208,9 @@ public class CaOutline extends Outline implements MouseListener {
                     int trail = image.getTrial();
                     return Integer.toString(trail);
 
+                case Condition:
+                    return image.getCondition();
+
                 case Slices:
                     int slices = image.getNslices();
                     if (slices < 0) {
@@ -248,14 +252,18 @@ public class CaOutline extends Outline implements MouseListener {
 
         @Override
         public void setValueFor(Object o, int i, Object o1) {
+            if (!(o1 instanceof String) || !(o instanceof CaImage)) {
+                return;
+            }
+
+            String str = (String) o1;
+            CaImage image = (CaImage) o;
+
             if (Column.fromInt(i) == Column.Trial) {
-                if (!(o1 instanceof String) || !(o instanceof CaImage)) {
-                    return;
-                }
-                String str = (String) o1;
-                CaImage image = (CaImage) o;
                 int trial = Integer.parseInt(str);
                 image.setTrial(trial);
+            } else if (Column.fromInt(i) == Column.Condition) {
+                image.setCondition(str);
             }
         }
 

@@ -28,6 +28,7 @@ public class CaImage extends CaTreeNode {
     private long mtime;
 
     private int trial;
+    private String condition;
 
     //live metadata
     private int nslices = -1;
@@ -259,6 +260,14 @@ public class CaImage extends CaTreeNode {
         this.trial = trial;
     }
 
+
+    public String getCondition() {
+        return condition;
+    }
+
+    public void setCondition(String condition) {
+        this.condition = condition;
+    }
 
     @Override
     public String toString() {
