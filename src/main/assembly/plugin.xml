@@ -13,13 +13,13 @@
             <useProjectArtifact>false</useProjectArtifact>
             <outputDirectory>/</outputDirectory>
             <unpack>true</unpack>
-			<!--
+
+            <!-- For plain, non-Fiji plugins use this below -->
             <excludes>
 			        <exclude>net.imagej:ij</exclude>
-                    <exclude>sc.fiji:*</exclude>
-
 			</excludes>
-            -->
+
+            <!--
             <includes>
                 <include>commons-io:commons-io</include>
                 <include>com.googlecode.json-simple:json-simple</include>
@@ -28,6 +28,7 @@
                 <include>org.hdfgroup:*</include>
                 <include>org.g_node:*</include>
             </includes>
+            -->
 
         </dependencySet>
     </dependencySets>
