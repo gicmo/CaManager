@@ -109,6 +109,13 @@ public class CaNeuronWindow extends JFrame implements CaOutline.Delegate, ImageL
 
     }
 
+    @MenuEntry(entryid = 23)
+    public void showAbout() {
+        CaAbout dlg = new CaAbout();
+        dlg.pack();
+        dlg.setVisible(true);
+    }
+
     @MenuEntry(entryid = 5)
     public void removeFiles() {
         int rows[] = outline.getSelectedRows();
@@ -768,6 +775,8 @@ public class CaNeuronWindow extends JFrame implements CaOutline.Delegate, ImageL
         mb.createMenuItem("New", 0);
         mb.createMenuItem("Open", 1);
         mb.createMenuItem("Save", 2);
+        mb.createSeparator();
+        mb.createMenuItem("About", 23);
         mb.createSeparator();
         mb.createMenuItem("Quit", 8);
         mb.createMenu("Neuron");
