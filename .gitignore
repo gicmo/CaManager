@@ -14,4 +14,4 @@ tasks.xml
 
 # idea
 .idea/
-Calcium.iml
+*.iml
