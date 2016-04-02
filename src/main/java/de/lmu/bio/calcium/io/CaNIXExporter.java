@@ -249,6 +249,14 @@ public class CaNIXExporter extends CaTask {
             meta.createProperty("region", new Value(value));
         }
 
+        if ((value = neuron.getCondition()) != null && value.length() > 0) {
+            meta.createProperty("condition", new Value(value));
+        }
+
+        if ((value = neuron.getSex()) != null && value.length() > 0) {
+            meta.createProperty("sex", new Value(value));
+        }
+
         ArrayList<CaImage> images = neuron.getImages(true);
         imagesTotal = images.size();
 

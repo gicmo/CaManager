@@ -4,6 +4,7 @@ import ij.gui.PolygonRoi;
 import ij.gui.Roi;
 import tracing.Path;
 
+import javax.swing.*;
 import javax.vecmath.Point2d;
 
 public class CaUtils {
@@ -30,5 +31,21 @@ public class CaUtils {
         System.err.println("Points: " + path.points + "downsampled to: " + result.length);
 
         return new PolygonRoi(x, y, result.length, Roi.POLYLINE);
+    }
+
+    public static Object findEntryInComboBox(JComboBox box, String item) {
+        return box.getItemAt(findIndexInComboBox(box, item));
+    }
+
+    public static int findIndexInComboBox(JComboBox box, String item) {
+        final int n = box.getItemCount();
+
+        for (int i = 0; i < n; i++) {
+            if (box.getItemAt(i).equals(item)) {
+                return i;
+            }
+        }
+
+        return 0;
     }
 }
