@@ -6,7 +6,7 @@
 
     <groupId>de.bio.lmu</groupId>
     <artifactId>Calcium</artifactId>
-    <version>0.3</version>
+    <version>0.4</version>
 
     <properties>
         <kotlin.version>1.0.0</kotlin.version>
