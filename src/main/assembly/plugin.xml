@@ -26,6 +26,7 @@
                 <include>org.netbeans.api:org-netbeans-swing-outline</include>
                 <include>jgoodies:forms</include>
                 <include>org.hdfgroup:*</include>
+                <include>org.g_node:*</include>
             </includes>
 
         </dependencySet>
