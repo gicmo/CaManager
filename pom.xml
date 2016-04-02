@@ -165,6 +165,12 @@
             <version>1.7.18</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.intellij</groupId>
+            <artifactId>forms_rt</artifactId>
+            <version>7.0.3</version>
+        </dependency>
+
 
         <dependency>
             <groupId>org.netbeans.api</groupId>
