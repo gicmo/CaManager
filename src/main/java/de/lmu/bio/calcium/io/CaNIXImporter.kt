@@ -58,11 +58,12 @@ class CaNIXImporter(val path: String)
     val meta = parent.metadata
 
     val filename = meta.getProperty("filename").values[0].string
-    var ps = if (path.endsWith("/")) path else path + "/"
+    var ps = java.io.File(java.io.File(path).parentFile, filename)
 
-    var path = ps + filename
-    if (! java.io.File(path).exists()) {
-      path = meta.getProperty("original_path").values[0].string
+    var path = if (ps.exists()) {
+      ps.absolutePath
+    } else {
+      meta.getProperty("original_path").values[0].string
     }
 
     var img = CaImage(path)
