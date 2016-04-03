@@ -220,6 +220,13 @@ public class CaNIXExporter extends CaTask {
         KymoExporter exporter = new KymoExporter(img, g, ip);
         rois.forEach(exporter::exportKymo);
 
+        try {
+            im.close();
+            g.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         imageProcessed++;
     }
 
