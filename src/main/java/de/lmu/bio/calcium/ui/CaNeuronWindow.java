@@ -9,6 +9,7 @@ import de.lmu.bio.calcium.model.CaTreeNode;
 import de.lmu.bio.calcium.tools.CaAutoAligner;
 import de.lmu.bio.calcium.tools.CaDriftEstimator;
 import de.lmu.bio.calcium.tools.CaKymoGrapher;
+import de.lmu.bio.calcium.tools.CaRoiCloner;
 import de.lmu.bio.calcium.utils.CaAlgorithms;
 import de.lmu.bio.calcium.utils.CaImageUtils;
 import ij.*;
@@ -326,6 +327,39 @@ public class CaNeuronWindow extends JFrame implements CaOutline.Delegate, ImageL
         CaNeuron neuron = importer.getNeuron();
         setNeuron(neuron);
         finishTask(importer);
+    }
+
+    @MenuEntry(entryid = 24)
+    public void copyROIs() {
+
+        CaNeuron neuron = getNeuron();
+
+        GenericDialog gd = new GenericDialog("Copy ROIs");
+        ArrayList<CaImage> images = neuron.getImages(true);
+
+        if (images.size() < 1) {
+            IJ.showMessage("No Images", "No images :( Need some!");
+            return;
+        }
+
+        String[] names = images.stream().map(CaImage::getName).toArray(String[]::new);
+        gd.addChoice("Source Image: ", names, names[0]);
+        gd.showDialog();
+
+        if (gd.wasCanceled())
+            return;
+
+        int idx = gd.getNextChoiceIndex();
+        CaImage source = images.get(idx);
+        System.err.print("Using source image: " + source.getName());
+
+        Roi r = source.getRoiFg();
+        Point shift = new Point(0, 0);
+
+        for (CaImage img : images) {
+            img.setRoiFg(CaRoiCloner.cloneMove(r, shift));
+            treeModel.nodeStructureChanged(img);
+        }
     }
 
     @MenuEntry(entryid = 6)
@@ -782,7 +816,8 @@ public class CaNeuronWindow extends JFrame implements CaOutline.Delegate, ImageL
         mb.createMenuItem("Add files", 4);
         mb.createMenuItem("Remove files", 5);
         mb.createMenu("Tools");
-        mb.createMenuItem("Trace to Roi", 13);
+        mb.createMenuItem("Copy ROIs", 24);
+        mb.createMenuItem("Trace to ROI", 13);
         mb.createMenuItem("Align ROIs", 6);
         mb.createSeparator();
         mb.createMenuItem("Estimate drift [All]", 9);
