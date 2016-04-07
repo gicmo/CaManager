@@ -12,6 +12,8 @@ public class CaNeuron extends CaGroup {
     private String commonFilePrefix;
     private String sex;
     private String condition;
+    private String subregion;
+    private String litter;
 
     public CaNeuron(String name) {
         super(name);
@@ -68,6 +70,22 @@ public class CaNeuron extends CaGroup {
 
     public void setCondition(String condition) {
         this.condition = condition;
+    }
+
+    public String getSubregion() {
+        return subregion;
+    }
+
+    public void setSubregion(String subregion) {
+        this.subregion = subregion;
+    }
+
+    public String getLitter() {
+        return litter;
+    }
+
+    public void setLitter(String litter) {
+        this.litter = litter;
     }
 
     public String getCommonFilePrefix() {
