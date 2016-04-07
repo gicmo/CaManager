@@ -33,8 +33,20 @@ class CaNIXImporter(val path: String)
       theNeuron?.age = meta.getProperty("age").values[0].string
     }
 
-    if (meta.hasProperty("comment")) {
-      theNeuron?.comment = meta.getProperty("comment").values[0].string
+    if (meta.hasProperty("condition")) {
+      theNeuron?.condition = meta.getProperty("condition").values[0].string
+    }
+
+    if (meta.hasProperty("sex")) {
+      theNeuron?.sex = meta.getProperty("sex").values[0].string
+    }
+
+    if (meta.hasProperty("sex")) {
+      theNeuron?.subregion = meta.getProperty("subregion").values[0].string
+    }
+
+    if (meta.hasProperty("litter")) {
+      theNeuron?.comment = meta.getProperty("litter").values[0].string
     }
 
     var imageGroups = block.getGroups { g -> g.type == "image.ca"}
