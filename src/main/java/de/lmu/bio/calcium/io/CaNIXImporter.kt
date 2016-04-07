@@ -30,7 +30,7 @@ class CaNIXImporter(val path: String)
     }
 
     if (meta.hasProperty("age")) {
-      theNeuron?.region = meta.getProperty("age").values[0].string
+      theNeuron?.age = meta.getProperty("age").values[0].string
     }
 
     if (meta.hasProperty("comment")) {
