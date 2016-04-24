@@ -125,7 +125,7 @@
         <!-- NIX -->
         <dependency>
             <groupId>org.g_node</groupId>
-            <artifactId>nix-${os.id}-${os.arch}</artifactId>
+            <artifactId>nix-java</artifactId>
             <version>1.1.0</version>
         </dependency>
 
@@ -196,12 +196,6 @@
             <artifactId>formats-gpl</artifactId>
             <version>5.1.8</version>
             <scope>compile</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.jetbrains.kotlin</groupId>
-            <artifactId>kotlin-stdlib</artifactId>
-            <version>${kotlin.version}</version>
         </dependency>
 
     </dependencies>
