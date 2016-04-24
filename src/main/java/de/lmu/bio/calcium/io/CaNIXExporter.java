@@ -83,7 +83,8 @@ public class CaNIXExporter extends CaTask {
                 RangeDimension dim = da.appendRangeDimension(metadata.ticks());
                 dim.setUnit("s");
                 dim.setLabel("time");
-                da.appendSetDimension();
+                da.appendSampledDimension(1.0);
+                da.setLabel("location");
             }
 
             group.addDataArray(da);
