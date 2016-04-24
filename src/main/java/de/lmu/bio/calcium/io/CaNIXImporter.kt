@@ -41,7 +41,7 @@ class CaNIXImporter(val path: String)
       theNeuron?.sex = meta.getProperty("sex").values[0].string
     }
 
-    if (meta.hasProperty("sex")) {
+    if (meta.hasProperty("subregion")) {
       theNeuron?.subregion = meta.getProperty("subregion").values[0].string
     }
 
