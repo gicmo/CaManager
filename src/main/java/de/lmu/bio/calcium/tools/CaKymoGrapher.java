@@ -66,9 +66,6 @@ public class CaKymoGrapher {
             ImageProcessor cip = stack.getProcessor(i+1);
             for (int p = 0; p < points.length; p++) {
                 final Point2d point = points[p];
-                if (i == 0)
-                    System.err.println(point);
-
                 data[p][i] = (float) cip.getInterpolatedValue(point.x, point.y);
             }
         }
