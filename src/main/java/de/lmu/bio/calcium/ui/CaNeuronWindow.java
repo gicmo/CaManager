@@ -21,7 +21,6 @@ import ij.process.FloatProcessor;
 import org.netbeans.swing.outline.OutlineModel;
 
 import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import java.awt.*;
