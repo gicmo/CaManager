@@ -87,6 +87,7 @@ class CaNIXImporter(val path: String)
 
     val chans = parent.getDataArray(parent.name + ".channels")
     val data = IntArray(chans.dataExtent.data[0])
+    //FIXME: load data
     val dim = chans.dimensions[0].asRangeDimension()
     val ticks = dim.ticks
 
