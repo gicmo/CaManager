@@ -25,8 +25,6 @@ public class CaNIXExporter extends CaTask {
     private int imagesTotal = 0;
     private int imageProcessed = 0;
 
-    //nix global
-    private File  nixfd;
     private Block block;
     private Section meta;
 
@@ -80,11 +78,12 @@ public class CaNIXExporter extends CaTask {
                     metadata.planeInfo.length == data[0].length;
 
             if (correctMetadata) {
+                SampledDimension dim0 =  da.appendSampledDimension(1.0);
+                dim0.setLabel("location");
+
                 RangeDimension dim = da.appendRangeDimension(metadata.ticks());
                 dim.setUnit("s");
                 dim.setLabel("time");
-                da.appendSampledDimension(1.0);
-                da.setLabel("location");
             }
 
             group.addDataArray(da);
@@ -208,25 +207,18 @@ public class CaNIXExporter extends CaTask {
             g.addDataArray(cd);
         }
 
-        ImagePlus ip = IJ.openImage(img.getFilePath());
+        ImagePlus ip =  img.openImage();
 
         if (ip == null) {
             imageProcessed++;
             IJ.error("Could not open Image: " + name);
             return;
         }
-
+        
         List<CaRoiBox> rois = img.listRois();
 
         KymoExporter exporter = new KymoExporter(img, g, ip);
         rois.forEach(exporter::exportKymo);
-
-        try {
-            im.close();
-            g.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
 
         imageProcessed++;
     }
@@ -235,7 +227,7 @@ public class CaNIXExporter extends CaTask {
     public void runTask() throws Exception {
         fireTaskProgress(imageProcessed, imagesTotal, "Starting export...");
 
-        nixfd = File.open(path, FileMode.Overwrite);
+        File nixfd = File.open(path, FileMode.Overwrite);
 
         // everything will be on that block
         block = nixfd.createBlock(neuron.getName(), "neuron");
@@ -280,6 +272,7 @@ public class CaNIXExporter extends CaTask {
 
         meta.close();
         block.close();
+
         nixfd.close();
     }
 
