@@ -194,6 +194,7 @@ public class CaNeuronEditor extends JDialog {
         final DefaultComboBoxModel defaultComboBoxModel5 = new DefaultComboBoxModel();
         defaultComboBoxModel5.addElement("lateral");
         defaultComboBoxModel5.addElement("medial");
+        defaultComboBoxModel5.addElement("N/A");
         cbSubRegion.setModel(defaultComboBoxModel5);
         panel3.add(cbSubRegion, new GridConstraints(5, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         label5.setLabelFor(txtComment);

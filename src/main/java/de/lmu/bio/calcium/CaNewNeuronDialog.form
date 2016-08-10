@@ -212,6 +212,7 @@
               <model>
                 <item value="lateral"/>
                 <item value="medial"/>
+                <item value="N/A"/>
               </model>
             </properties>
           </component>

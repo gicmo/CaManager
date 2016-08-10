@@ -250,6 +250,7 @@ public class CaNewNeuronDialog extends JDialog {
         final DefaultComboBoxModel defaultComboBoxModel4 = new DefaultComboBoxModel();
         defaultComboBoxModel4.addElement("lateral");
         defaultComboBoxModel4.addElement("medial");
+        defaultComboBoxModel4.addElement("N/A");
         cbSubRegion.setModel(defaultComboBoxModel4);
         panel3.add(cbSubRegion, new GridConstraints(4, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         litter = new JTextField();
