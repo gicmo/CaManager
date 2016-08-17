@@ -1,6 +1,8 @@
 package de.lmu.bio.calcium.ui;
 
 import de.lmu.bio.calcium.model.CaImage;
+import de.lmu.bio.calcium.model.CaRoiBox;
+import de.lmu.bio.calcium.model.CaRoiClass;
 import ij.IJ;
 import ij.ImagePlus;
 import ij.gui.*;
@@ -119,10 +121,6 @@ public class CaImageWindow extends StackWindow implements MouseListener {
             System.err.print("ROI REMOVED (+)!\n");
         }
 
-        public boolean missRoiType(String type) {
-            return getIndex(type) == -1;
-        }
-
         @Override
         public void add(Roi roi) {
 
@@ -130,32 +128,9 @@ public class CaImageWindow extends StackWindow implements MouseListener {
                 return;
 
             System.err.println("Overlay: Roi added!");
-
-            int type = -1;
-            //Exclude certain types from being valid FG & BG Rois
-            if (roi.getType() > 1 ) {
-                if (missRoiType("FG")) {
-                    type = 1;
-                } else if (missRoiType("BG")) {
-                    type = 0;
-                }
-            }
-
-            switch(type) {
-                case 0:
-                    roi.setStrokeColor(Color.blue);
-                    roi.setName("BG");
-                    image.setRoiBg(roi);
-                    break;
-
-                case 1:
-                    roi.setName("FG");
-                    roi.setStrokeColor(Color.red);
-                    image.setRoiFg(roi);
-                    break;
-
-                default:
-                    roi.setStrokeWidth(0.1);
+            CaRoiBox box = image.maybeAddRoi(roi);
+            if (box != null) {
+                System.err.println("Roi added as " + box.getName());
             }
 
             super.add(roi);
