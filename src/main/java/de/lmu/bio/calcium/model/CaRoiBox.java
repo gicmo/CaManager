@@ -39,8 +39,10 @@ public class CaRoiBox extends CaTreeNode {
     }
 
     public boolean isBackground() {
-        return getName().equals("BG");
+        return getName().startsWith("BG");
     }
+
+    public CaRoiClass getRoiClass() { return isForeground() ? CaRoiClass.FOREGROUND : CaRoiClass.BACKGROUND; }
 
     // wrap some Roi functions for convenience
 
@@ -53,4 +55,5 @@ public class CaRoiBox extends CaTreeNode {
     public FloatPolygon getFloatPolygon() {
         return roi.getFloatPolygon();
     }
+
 }
