@@ -20,7 +20,6 @@ import java.io.File;
 import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class CaImage extends CaTreeNode {
 
@@ -184,6 +183,52 @@ public class CaImage extends CaTreeNode {
 
         AbstractList<?> ol = (AbstractList<?>) children;
         return (int) ol.stream().filter(o -> o instanceof CaRoiBox).count();
+    }
+
+    public CaRoiClass nextRoiClass() {
+        java.util.List<CaRoiBox> rois = listRois();
+
+        final boolean haveFg = rois.stream().anyMatch(CaRoiBox::isForeground);
+        if (! haveFg) {
+            return CaRoiClass.FOREGROUND;
+        }
+
+        return CaRoiClass.BACKGROUND;
+    }
+
+    public CaRoiBox maybeAddRoi(Roi roi) {
+        java.util.List<CaRoiBox> rois = listRois();
+
+        if (rois.stream().anyMatch(b -> b.getRoi() == roi)) {
+            return null;
+        }
+
+        final boolean haveFg = rois.stream().anyMatch(CaRoiBox::isForeground);
+
+        CaRoiBox box = null;
+
+        if (! haveFg && CaRoiClass.checkType(roi, CaRoiClass.FOREGROUND)) {
+            roi.setName("FG");
+            roi.setStrokeColor(Color.RED);
+            box = new CaRoiBox(roi);
+        } else if (CaRoiClass.checkType(roi, CaRoiClass.BACKGROUND)) {
+            long count = rois.stream().filter(CaRoiBox::isBackground).count();
+            count++;
+            String name = "BG";
+            if (count > 1) {
+                name += "-" + Long.toString(count);
+            }
+
+            roi.setName(name);
+            roi.setStrokeColor(Color.BLUE);
+            box = new CaRoiBox(roi);
+        }
+
+        if (box != null) {
+            add(box);
+        }
+
+        return box;
     }
 
     public void setRoi(Roi value, String name) {
