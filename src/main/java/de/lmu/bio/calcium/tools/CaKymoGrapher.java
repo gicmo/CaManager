@@ -9,7 +9,9 @@ import ij.process.FloatPolygon;
 import ij.process.ImageProcessor;
 
 import javax.vecmath.Point2d;
+import java.awt.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class CaKymoGrapher {
 
@@ -73,19 +75,8 @@ public class CaKymoGrapher {
         return data;
     }
 
-    // heavily based on ij.gui.ProfilePlot
-    public static Point2d[] roi2YX(Roi roi) {
-        if (roi == null) {
-            IJ.error("KymoGraph", "Selection required.");
-            return null;
-        }
-
-        int roiType = roi.getType();
-        if (!(roiType==Roi.POLYLINE || roiType==Roi.FREELINE)) {
-            IJ.error("PolyLine or Freeline selection required.");
-            return null;
-        }
-
+    private static Point2d[] line2XY(Roi roi) {
+        //precondition: roi != null && (roiType==Roi.POLYLINE || roiType==Roi.FREELINE)
         int lineWidth = (int)Math.round(roi.getStrokeWidth());
         if (lineWidth > 1) {
             IJ.log("[WARNING] linewidth ignored!");
@@ -127,6 +118,31 @@ public class CaKymoGrapher {
         }
         Point2d[] points = new Point2d[values.size()];
         return values.toArray(points);
+    }
+
+    private static Point2d[] rect2YX(Roi roi) {
+        Point[] ps = roi.getContainedPoints();
+        return Arrays.stream(ps).map(p -> new Point2d(p.x, p.y)).toArray(Point2d[]::new);
+    }
+
+    // heavily based on ij.gui.ProfilePlot
+    public static Point2d[] roi2YX(Roi roi) {
+        if (roi == null) {
+            IJ.error("KymoGraph", "Selection required.");
+            return null;
+        }
+
+        int roiType = roi.getType();
+        if ((roiType==Roi.POLYLINE || roiType==Roi.FREELINE)) {
+            return line2XY(roi);
+        } else if (roiType == Roi.RECTANGLE) {
+            return rect2YX(roi);
+        } else {
+            IJ.error("Invalid roi type.");
+            return null;
+        }
+
+
     }
 
 }
