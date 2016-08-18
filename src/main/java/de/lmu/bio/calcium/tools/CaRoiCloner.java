@@ -45,6 +45,7 @@ public class CaRoiCloner {
             target.setStrokeWidth(target.getStrokeWidth());
             target.setStroke(source.getStroke());
             target.setFillColor(source.getFillColor());
+            target.setStrokeColor(source.getStrokeColor());
             target.setName(source.getName());
         }
 
