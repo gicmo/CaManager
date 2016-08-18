@@ -2,6 +2,8 @@ package de.lmu.bio.calcium.model;
 
 import ij.gui.Roi;
 
+import java.awt.*;
+
 public enum CaRoiClass {
     FOREGROUND, BACKGROUND;
 
@@ -32,5 +34,16 @@ public enum CaRoiClass {
             default:
                 return false;
         }
+    }
+
+    public Color roiColor() {
+        switch (this) {
+            case FOREGROUND:
+                return Color.RED;
+            case BACKGROUND:
+                return Color.BLUE;
+        }
+
+        return Color.YELLOW;
     }
 }
