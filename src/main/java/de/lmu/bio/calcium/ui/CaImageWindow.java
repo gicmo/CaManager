@@ -19,10 +19,10 @@ public class CaImageWindow extends StackWindow implements MouseListener {
     public CaImageWindow(ImagePlus timp, CaImage img, DefaultTreeModel treeModel) {
         super(new CaImagePlus(timp));
         this.image = img;
+        this.treeModel = treeModel;
         CaIWOverlay overlay = new CaIWOverlay();
         imp.setOverlay(overlay);
         getCanvas().addMouseListener(this);
-        this.treeModel = treeModel;
     }
 
     public static CaImageWindow createWindow(CaImage img, DefaultTreeModel treeModel) {
@@ -129,11 +129,12 @@ public class CaImageWindow extends StackWindow implements MouseListener {
 
             System.err.println("Overlay: Roi added!");
             CaRoiBox box = image.maybeAddRoi(roi);
-            if (box != null) {
-                System.err.println("Roi added as " + box.getName());
-            }
 
             super.add(roi);
+            if (box != null) {
+                System.err.println("Roi added as " + box.getName());
+                treeModel.nodeStructureChanged(image);
+            }
         }
     }
 
