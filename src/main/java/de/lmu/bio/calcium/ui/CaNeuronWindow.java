@@ -333,7 +333,7 @@ public class CaNeuronWindow extends JFrame implements CaOutline.Delegate, ImageL
 
         CaNeuron neuron = getNeuron();
 
-        GenericDialog gd = new GenericDialog("Copy ROIs");
+        GenericDialog gd = new GenericDialog("Copy ROIs - Select Image");
         ArrayList<CaImage> images = neuron.getImages(true);
 
         if (images.size() < 1) {
@@ -352,11 +352,28 @@ public class CaNeuronWindow extends JFrame implements CaOutline.Delegate, ImageL
         CaImage source = images.get(idx);
         System.err.print("Using source image: " + source.getName());
 
-        Roi r = source.getRoiFg();
+        gd = new GenericDialog("Copy ROIs - Select Source ROI");
+
+        String[] rois = source.listRois().stream().map(CaRoiBox::getName).toArray(String[]::new);
+
+        gd.addChoice("Source ROI:", rois, rois[0]);
+        gd.showDialog();
+
+        if (gd.wasCanceled())
+            return;
+
+        String rtype = gd.getNextChoice();
+        Roi r = source.getRoi(rtype);
+
+        if (r == null) {
+            IJ.showMessage("Error", "Roi with name + '" + rtype +"' not found!");
+            return;
+        }
+
         Point shift = new Point(0, 0);
 
         for (CaImage img : images) {
-            img.setRoiFg(CaRoiCloner.cloneMove(r, shift));
+            img.setRoi(CaRoiCloner.cloneMove(r, shift), rtype);
             treeModel.nodeStructureChanged(img);
         }
     }
