@@ -15,10 +15,14 @@
             <unpack>true</unpack>
 
             <!-- For plain, non-Fiji plugins use this below -->
+            <!--
             <excludes>
 			        <exclude>net.imagej:ij</exclude>
 			</excludes>
-
+			-->
+            <includes>
+                <include>*</include>
+            </includes>
             <!--
             <includes>
                 <include>commons-io:commons-io</include>
