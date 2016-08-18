@@ -185,17 +185,6 @@ public class CaImage extends CaTreeNode {
         return (int) ol.stream().filter(o -> o instanceof CaRoiBox).count();
     }
 
-    public CaRoiClass nextRoiClass() {
-        java.util.List<CaRoiBox> rois = listRois();
-
-        final boolean haveFg = rois.stream().anyMatch(CaRoiBox::isForeground);
-        if (! haveFg) {
-            return CaRoiClass.FOREGROUND;
-        }
-
-        return CaRoiClass.BACKGROUND;
-    }
-
     public CaRoiBox maybeAddRoi(Roi roi) {
         java.util.List<CaRoiBox> rois = listRois();
 
@@ -218,11 +207,25 @@ public class CaImage extends CaTreeNode {
         if (cls == CaRoiClass.FOREGROUND) {
             roi.setName("FG");
         } else {
-            long count = rois.stream().filter(CaRoiBox::isBackground).count();
-            count++;
+            CaRoiBox[] bgs = rois.stream().filter(CaRoiBox::isBackground).toArray(CaRoiBox[]::new);
             String name = "BG";
-            if (count > 1) {
-                name += "-" + Long.toString(count);
+
+            if (bgs.length > 0) {
+                //find a free BG-XY name
+                for (int i = 0; i < (bgs.length+1); i++) {
+                    name = "BG-" + Long.toString(i+2); // we start at 2
+                    boolean found = false;
+                    for (CaRoiBox b : bgs) {
+                        if (b.getName().equals(name)) {
+                            found = true;
+                            break;
+                        }
+                    }
+
+                    if (!found) {
+                        break;
+                    }
+                }
             }
 
             roi.setName(name);
