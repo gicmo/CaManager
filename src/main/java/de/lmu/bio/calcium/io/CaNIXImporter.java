@@ -124,24 +124,17 @@ public class CaNIXImporter extends CaImporter {
         List<DataArray> roiData = g.getDataArrays(d -> d.getType().startsWith("roi.pt"));
 
         roiData.stream().map(d -> {
-            NDSize shape = d.getDataExtent();
-            float[] xy = new float[(int) shape.getElementsProduct()];
-            d.getData(xy, shape, new NDSize(2, 0));
 
             Section rm = d.getMetadata();
             int roiType = rm.getProperty("type").getValues().get(0).getInt();
-            double strokeWidth = rm.getProperty("strokeWidth").getValues().get(0).getDouble();
 
-            int n = shape.getData()[1];
-            float[] x = new float[n];
-            float[] y = new float[n];
-
-            System.arraycopy(xy, 0, x, 0, n);
-            System.arraycopy(xy, n, y, 0, n);
-
-            Roi roi = new PolygonRoi(x, y, roiType);
-            if (strokeWidth > 1.0) {
-                roi.setStrokeWidth(strokeWidth);
+            Roi roi = null;
+            if (roiType == Roi.RECTANGLE) {
+                roi = importRectRoi(d);
+            } else if (roiType == Roi.POLYLINE || roiType == Roi.FREELINE) {
+                roi = importPolyRoi(d);
+            } else {
+                return null;
             }
 
             String[] comps = d.getName().split("\\.");
@@ -159,10 +152,39 @@ public class CaNIXImporter extends CaImporter {
 
             roi.setStrokeColor(color);
             return box;
-        }).forEach(img::add);
+        }).filter(b -> b != null).forEach(img::add);
 
         imagesProcessed++;
         return img;
+    }
+
+    Roi importPolyRoi(DataArray d) {
+        Section rm = d.getMetadata();
+        int roiType = rm.getProperty("type").getValues().get(0).getInt();
+        double strokeWidth = rm.getProperty("strokeWidth").getValues().get(0).getDouble();
+
+        NDSize shape = d.getDataExtent();
+        float[] xy = new float[(int) shape.getElementsProduct()];
+        d.getData(xy, shape, new NDSize(2, 0));
+
+        int n = shape.getData()[1];
+        float[] x = new float[n];
+        float[] y = new float[n];
+
+        System.arraycopy(xy, 0, x, 0, n);
+        System.arraycopy(xy, n, y, 0, n);
+        Roi roi =  new PolygonRoi(x, y, roiType);
+        if (strokeWidth > 1.0) {
+            roi.setStrokeWidth(strokeWidth);
+        }
+        return roi;
+    }
+
+    Roi importRectRoi(DataArray d) {
+        float[] pts = new float[4];
+        d.getData(pts, new NDSize(1, 4), new NDSize(1, 0));
+
+        return new Roi(pts[0], pts[1], pts[2], pts[3]);
     }
 
 }

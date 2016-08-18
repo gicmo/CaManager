@@ -48,13 +48,14 @@ public class CaNIXExporter extends CaTask {
 
         boolean exportKymo(CaRoiBox roi) {
             int roiType = roi.getType();
-            if (!(roiType == Roi.POLYLINE || roiType == Roi.FREELINE)) {
+            if (!(roiType == Roi.POLYLINE || roiType == Roi.FREELINE || roiType == Roi.RECTANGLE)) {
                 IJ.error("Unsupported ROI type.");
                 return false;
             }
 
             String prefix = group.getName();
             String name = roi.getName().toLowerCase();
+            String type = roi.getRoiClass().toString();
 
             Point2d[] xy = CaKymoGrapher.roi2YX(roi.getRoi());
             float width = roi.getStrokeWidth();
@@ -67,7 +68,7 @@ public class CaNIXExporter extends CaTask {
             NDSize shape = mkSize(data);
             float[] flat = flatten(data);
 
-            DataArray da = block.createDataArray(prefix + ".kymo." + name, "kymo." + name, DataType.Float, shape);
+            DataArray da = block.createDataArray(prefix + ".kymo." + name, "kymo." + type, DataType.Float, shape);
             da.setData(flat, shape, new NDSize(2, 0));
             da.setLabel("calcium signal");
 
@@ -100,12 +101,38 @@ public class CaNIXExporter extends CaTask {
 
         DataArray saveRoiData(CaRoiBox roi) {
 
-            String type = "roi.pt." + roi.getName().toLowerCase();
-            String name = group.getName() + "." + type;
+            String type = "roi.pt." + roi.getRoiClass().toString();
+            String name = group.getName() + ".roi.pt." + roi.getName().toLowerCase();
+
+            DataArray da;
 
             int roiType = roi.getType();
+            if (roiType == Roi.FREELINE || roiType == Roi.POLYLINE) {
+                FloatPolygon p = roi.getFloatPolygon();
+                da = mkRoiDataArray(p, name, type);
+            } else if (roiType == Roi.RECTANGLE) {
+                da = mkRoiDataArray(roi.getRoi().getBounds(), name, type);
+            } else {
+                return null;
+            }
+
             float strokeWidth = roi.getStrokeWidth();
-            FloatPolygon p = roi.getFloatPolygon();
+
+            Section root = block.getMetadata();
+            Section meta = root.createSection(name, "roi");
+
+            meta.createProperty("type", new Value(roiType));
+            meta.createProperty("strokeWidth", new Value(strokeWidth));
+
+            Color c = roi.getRoi().getStrokeColor();
+            meta.createProperty("color", new Value(c.getRGB()));
+
+            da.setMetadata(meta);
+
+            return da;
+        }
+
+        DataArray mkRoiDataArray(FloatPolygon p, String name, String type) {
 
             int n = p.npoints;
             float[] x = p.xpoints;
@@ -119,16 +146,17 @@ public class CaNIXExporter extends CaTask {
             dm.setLabels(Arrays.asList("x", "y"));
             SetDimension dn = da.appendSetDimension();
 
-            Section root = block.getMetadata();
-            Section meta = root.createSection(name, "roi");
+            return da;
+        }
 
-            meta.createProperty("type", new Value(roiType));
-            meta.createProperty("strokeWidth", new Value(strokeWidth));
+        DataArray mkRoiDataArray(Rectangle r, String name, String type) {
+            int[] pts = new int[]{r.x, r.y, r.width, r.height};
 
-            Color c = roi.getRoi().getStrokeColor();
-            meta.createProperty("color", new Value(c.getRGB()));
+            DataArray da = block.createDataArray(name, type, DataType.Float, new NDSize(new int[]{4}));
+            da.setData(pts, new NDSize(new int[]{4}), new NDSize(new int[]{0}));
 
-            da.setMetadata(meta);
+            SetDimension dm = da.appendSetDimension();
+            dm.setLabels(Arrays.asList("x", "y", "width", "height"));
 
             return da;
         }
