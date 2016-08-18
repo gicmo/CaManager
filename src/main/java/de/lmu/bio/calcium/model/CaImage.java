@@ -206,12 +206,18 @@ public class CaImage extends CaTreeNode {
         final boolean haveFg = rois.stream().anyMatch(CaRoiBox::isForeground);
 
         CaRoiBox box = null;
+        CaRoiClass cls = !haveFg ? CaRoiClass.FOREGROUND : CaRoiClass.BACKGROUND;
 
-        if (! haveFg && CaRoiClass.checkType(roi, CaRoiClass.FOREGROUND)) {
+        if (! cls.checkType(roi)) {
+            return null;
+        }
+
+        box = new CaRoiBox(roi);
+        roi.setStrokeColor(cls.roiColor());
+
+        if (cls == CaRoiClass.FOREGROUND) {
             roi.setName("FG");
-            roi.setStrokeColor(Color.RED);
-            box = new CaRoiBox(roi);
-        } else if (CaRoiClass.checkType(roi, CaRoiClass.BACKGROUND)) {
+        } else {
             long count = rois.stream().filter(CaRoiBox::isBackground).count();
             count++;
             String name = "BG";
@@ -220,15 +226,18 @@ public class CaImage extends CaTreeNode {
             }
 
             roi.setName(name);
-            roi.setStrokeColor(Color.BLUE);
-            box = new CaRoiBox(roi);
         }
 
-        if (box != null) {
-            add(box);
-        }
+        add(box);
 
         return box;
+    }
+
+    public void remove(Roi roi) {
+        CaRoiBox box = getRoiBox(roi.getName());
+        if (box != null) {
+            remove(box);
+        }
     }
 
     public void setRoi(Roi value, String name) {
