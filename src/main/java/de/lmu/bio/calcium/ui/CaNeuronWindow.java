@@ -30,6 +30,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.stream.IntStream;
 
 
 public class CaNeuronWindow extends JFrame implements CaOutline.Delegate, ImageListener, WindowListener, FocusListener {
@@ -355,26 +356,32 @@ public class CaNeuronWindow extends JFrame implements CaOutline.Delegate, ImageL
         gd = new GenericDialog("Copy ROIs - Select Source ROI");
 
         String[] rois = source.listRois().stream().map(CaRoiBox::getName).toArray(String[]::new);
+        boolean[] bs = new boolean[rois.length];
+        Boolean[] l = source.listRois().stream().map(CaRoiBox::isBackground).toArray(Boolean[]::new);
+        IntStream.range(0, l.length).forEach(x -> bs[x] = l[x]);
 
         gd.addChoice("Source ROI:", rois, rois[0]);
+        gd.addCheckboxGroup(rois.length, 1, rois, bs);
         gd.showDialog();
 
         if (gd.wasCanceled())
             return;
 
-        String rtype = gd.getNextChoice();
-        Roi r = source.getRoi(rtype);
-
-        if (r == null) {
-            IJ.showMessage("Error", "Roi with name + '" + rtype +"' not found!");
-            return;
-        }
-
         Point shift = new Point(0, 0);
+        for (String id : rois) {
+            boolean cloneRoi = gd.getNextBoolean();
+            if (!cloneRoi) {
+                continue;
+            }
+            for (CaImage img : images) {
+                if (img == source) {
+                    continue;
+                }
 
-        for (CaImage img : images) {
-            img.setRoi(CaRoiCloner.cloneMove(r, shift), rtype);
-            treeModel.nodeStructureChanged(img);
+                Roi r = source.getRoi(id);
+                img.setRoi(CaRoiCloner.cloneMove(r, shift), id);
+                treeModel.nodeStructureChanged(img);
+            }
         }
     }
 
