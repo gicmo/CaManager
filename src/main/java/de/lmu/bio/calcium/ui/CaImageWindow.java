@@ -96,22 +96,21 @@ public class CaImageWindow extends StackWindow implements MouseListener {
     public class CaIWOverlay extends Overlay {
 
         public CaIWOverlay() {
+            for (CaRoiBox box : image.listRois()) {
+                add(box.getRoi());
+
+            }
+
             drawLabels(true);
             drawNames(true);
             drawBackgrounds(true);
-            add(image.getRoiFg());
-            add(image.getRoiBg());
         }
 
         @Override
         public void remove(Roi roi) {
             super.remove(roi);
             System.err.print("ROI REMOVED!\n");
-            if (image.getRoiBg() == roi) {
-                image.setRoiBg(null);
-            } else if (image.getRoiFg() == roi) {
-                image.setRoiFg(null);
-            }
+            image.remove(roi);
         }
 
         @Override
