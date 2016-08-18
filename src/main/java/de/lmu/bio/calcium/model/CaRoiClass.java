@@ -46,4 +46,15 @@ public enum CaRoiClass {
 
         return Color.YELLOW;
     }
+
+    public String toString() {
+        switch (this) {
+            case FOREGROUND:
+                return "fg";
+            case BACKGROUND:
+                return "bg";
+        }
+
+        return "unknown";
+    }
 }
