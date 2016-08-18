@@ -4,11 +4,13 @@ package de.lmu.bio.calcium.io;
 import de.lmu.bio.calcium.model.CaImage;
 import de.lmu.bio.calcium.model.CaNeuron;
 import de.lmu.bio.calcium.model.CaRoiBox;
+import de.lmu.bio.calcium.model.CaRoiClass;
 import ij.gui.PolygonRoi;
 import ij.gui.Roi;
 import org.g_node.nix.*;
 import ucar.ma2.Array;
 
+import java.awt.*;
 import java.util.Comparator;
 import java.util.List;
 
@@ -145,7 +147,18 @@ public class CaNIXImporter extends CaImporter {
             String[] comps = d.getName().split("\\.");
             roi.setName(comps[comps.length - 1].toUpperCase());
 
-            return new CaRoiBox(roi);
+            CaRoiBox box =  new CaRoiBox(roi);
+            Color color = null;
+            if (rm.hasProperty("color")) {
+                int rgb = rm.getProperty("color").getValues().get(0).getInt();
+                color = new Color(rgb);
+            } else {
+                CaRoiClass cls = box.getRoiClass();
+                color = cls.roiColor();
+            }
+
+            roi.setStrokeColor(color);
+            return box;
         }).forEach(img::add);
 
         imagesProcessed++;

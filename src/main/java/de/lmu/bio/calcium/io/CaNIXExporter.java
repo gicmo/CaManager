@@ -10,6 +10,7 @@ import ij.ImagePlus;
 import ij.gui.Roi;
 
 import javax.vecmath.Point2d;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -123,6 +124,9 @@ public class CaNIXExporter extends CaTask {
 
             meta.createProperty("type", new Value(roiType));
             meta.createProperty("strokeWidth", new Value(strokeWidth));
+
+            Color c = roi.getRoi().getStrokeColor();
+            meta.createProperty("color", new Value(c.getRGB()));
 
             da.setMetadata(meta);
 
