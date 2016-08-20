@@ -360,7 +360,6 @@ public class CaNeuronWindow extends JFrame implements CaOutline.Delegate, ImageL
         Boolean[] l = source.listRois().stream().map(CaRoiBox::isBackground).toArray(Boolean[]::new);
         IntStream.range(0, l.length).forEach(x -> bs[x] = l[x]);
 
-        gd.addChoice("Source ROI:", rois, rois[0]);
         gd.addCheckboxGroup(rois.length, 1, rois, bs);
         gd.showDialog();
 
