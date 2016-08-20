@@ -40,6 +40,8 @@ public class CaManager_ implements PlugIn {
 
         if (arg.equals("new")) {
             wnd.create();
+        } else if (arg.equals("open")) {
+            wnd.load();
         }
     }
 
