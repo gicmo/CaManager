@@ -422,6 +422,53 @@ public class CaNeuronWindow extends JFrame implements CaOutline.Delegate, ImageL
         }
     }
 
+    @MenuEntry(entryid = 26)
+    public void duplicateROI() {
+        CaNeuron neuron = getNeuron();
+
+        GenericDialog gd = new GenericDialog("Duplicate ROIs - Select Image");
+        ArrayList<CaImage> images = neuron.getImages(true);
+
+        if (images.size() < 1) {
+            IJ.showMessage("No Images", "No images :( Need some!");
+            return;
+        }
+
+        String[] names = images.stream().map(CaImage::getName).toArray(String[]::new);
+        gd.addChoice("Target Image: ", names, names[0]);
+        gd.showDialog();
+
+        if (gd.wasCanceled())
+            return;
+
+        int idx = gd.getNextChoiceIndex();
+        CaImage target = images.get(idx);
+        System.err.print("Using target image: " + target.getName());
+
+        gd = new GenericDialog("Duplicate ROIs - Select Source ROI");
+        names = target.listRois().stream().map(CaRoiBox::getName).toArray(String[]::new);
+        gd.addChoice("Source ROIs: ", names, names[0]);
+        gd.addNumericField("Offset  X", 10, 0);
+        gd.addNumericField("Offset  Y", 10, 0);
+
+        gd.showDialog();
+        if (gd.wasCanceled())
+            return;
+
+        idx = gd.getNextChoiceIndex();
+        Roi old = target.getRoi(names[idx]);
+
+        int x = (int) gd.getNextNumber();
+        int y = (int) gd.getNextNumber();
+
+        Roi rnew = CaRoiCloner.cloneMove(old, new Point(x, y));
+        rnew.setName("NewRoi");
+        CaRoiBox box = target.maybeAddRoi(rnew);
+        if (box != null) {
+            treeModel.nodeStructureChanged(target);
+        }
+    }
+
     @MenuEntry(entryid = 6)
     public void alignROIs() {
         try {
@@ -880,6 +927,7 @@ public class CaNeuronWindow extends JFrame implements CaOutline.Delegate, ImageL
         mb.createMenuItem("Trace to ROI", 13);
         mb.createMenuItem("Align ROIs", 6);
         mb.createMenuItem("Add Rectangular ROI", 25);
+        mb.createMenuItem("Duplicate ROI", 26);
         mb.createSeparator();
         mb.createMenuItem("Estimate drift [All]", 9);
         mb.createMenuItem("Estimate drift [Single]", 11);
