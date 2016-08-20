@@ -385,6 +385,43 @@ public class CaNeuronWindow extends JFrame implements CaOutline.Delegate, ImageL
         }
     }
 
+    @MenuEntry(entryid = 25)
+    public void addRectROI() {
+        CaNeuron neuron = getNeuron();
+
+        GenericDialog gd = new GenericDialog("Add Rect ROIs - Select Image");
+        ArrayList<CaImage> images = neuron.getImages(true);
+
+        if (images.size() < 1) {
+            IJ.showMessage("No Images", "No images :( Need some!");
+            return;
+        }
+
+        String[] names = images.stream().map(CaImage::getName).toArray(String[]::new);
+        gd.addChoice("Target Image: ", names, names[0]);
+        gd.addNumericField("Rect size", 10, 0);
+        gd.addNumericField("Offset  X", 10, 0);
+        gd.addNumericField("Offset  Y", 10, 0);
+        gd.showDialog();
+
+        if (gd.wasCanceled())
+            return;
+
+        int idx = gd.getNextChoiceIndex();
+        CaImage target = images.get(idx);
+        System.err.print("Using target image: " + target.getName());
+
+        int size = (int) gd.getNextNumber();
+        int x = (int) gd.getNextNumber();
+        int y = (int) gd.getNextNumber();
+
+        Roi roi = new Roi(x, y, size, size);
+        CaRoiBox box = target.maybeAddRoi(roi);
+        if (box != null) {
+            treeModel.nodeStructureChanged(target);
+        }
+    }
+
     @MenuEntry(entryid = 6)
     public void alignROIs() {
         try {
@@ -842,6 +879,7 @@ public class CaNeuronWindow extends JFrame implements CaOutline.Delegate, ImageL
         mb.createMenuItem("Synchronize ROIs", 24);
         mb.createMenuItem("Trace to ROI", 13);
         mb.createMenuItem("Align ROIs", 6);
+        mb.createMenuItem("Add Rectangular ROI", 25);
         mb.createSeparator();
         mb.createMenuItem("Estimate drift [All]", 9);
         mb.createMenuItem("Estimate drift [Single]", 11);
