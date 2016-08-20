@@ -95,7 +95,7 @@
         <dependency>
             <groupId>org.g_node</groupId>
             <artifactId>nix-java</artifactId>
-            <version>1.1.0</version>
+            <version>1.2.1</version>
         </dependency>
 
         <!-- H5 -->
@@ -192,63 +192,5 @@
         </repository>
 
     </repositories>
-
-    <!-- This is for nix -->
-    <profiles>
-        <profile>
-            <id>osx</id>
-            <activation>
-                <os><name>mac os x</name></os>
-            </activation>
-            <properties>
-                <os.id>macosx</os.id>
-            </properties>
-        </profile>
-        <profile>
-            <id>linux</id>
-            <activation>
-                <os>
-                    <name>linux</name>
-                </os>
-            </activation>
-            <properties>
-                <os.id>linux</os.id>
-            </properties>
-        </profile>
-        <profile>
-            <id>windows</id>
-            <activation>
-                <os>
-                    <family>windows</family>
-                </os>
-            </activation>
-            <properties>
-                <os.id>windows</os.id>
-            </properties>
-        </profile>
-
-        <profile>
-            <id>amd64</id>
-            <activation>
-                <os>
-                    <arch>amd64</arch>
-                </os>
-            </activation>
-            <properties>
-                <os.arch>x86_64</os.arch>
-            </properties>
-        </profile>
-        <profile>
-            <id>x86-64</id>
-            <activation>
-                <os>
-                    <arch>x86-64</arch>
-                </os>
-            </activation>
-            <properties>
-                <os.arch>x86_64</os.arch>
-            </properties>
-        </profile>
-    </profiles>
 
 </project>
