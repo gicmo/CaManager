@@ -121,8 +121,30 @@ public class CaKymoGrapher {
     }
 
     private static Point2d[] rect2YX(Roi roi) {
-        Point[] ps = roi.getContainedPoints();
+        Point[] ps = getContainedPoints(roi);
         return Arrays.stream(ps).map(p -> new Point2d(p.x, p.y)).toArray(Point2d[]::new);
+    }
+
+    //backport of the from ij.gui.Roi since it is not avaiable in stable releases
+    //of IJ from imagej.net yet.
+    private static Point[] getContainedPoints(Roi roi) {
+        if (roi.isLine()) {
+            FloatPolygon p = roi.getInterpolatedPolygon();
+            Point[] points = new Point[p.npoints];
+            for (int i=0; i<p.npoints; i++)
+                points[i] = new Point((int)Math.round(p.xpoints[i]),(int)Math.round(p.ypoints[i]));
+            return points;
+        }
+        ImageProcessor mask = roi.getMask();
+        Rectangle bounds = roi.getBounds();
+        ArrayList points = new ArrayList();
+        for (int y=0; y<bounds.height; y++) {
+            for (int x=0; x<bounds.width; x++) {
+                if (mask==null || mask.getPixel(x,y)!=0)
+                    points.add(new Point(bounds.x+x, bounds.y+y));
+            }
+        }
+        return (Point[])points.toArray(new Point[points.size()]);
     }
 
     // heavily based on ij.gui.ProfilePlot
