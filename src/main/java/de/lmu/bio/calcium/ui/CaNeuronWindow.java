@@ -334,7 +334,7 @@ public class CaNeuronWindow extends JFrame implements CaOutline.Delegate, ImageL
 
         CaNeuron neuron = getNeuron();
 
-        GenericDialog gd = new GenericDialog("Copy ROIs - Select Image");
+        GenericDialog gd = new GenericDialog("Synchronize ROIs - Select Image");
         ArrayList<CaImage> images = neuron.getImages(true);
 
         if (images.size() < 1) {
@@ -353,7 +353,7 @@ public class CaNeuronWindow extends JFrame implements CaOutline.Delegate, ImageL
         CaImage source = images.get(idx);
         System.err.print("Using source image: " + source.getName());
 
-        gd = new GenericDialog("Copy ROIs - Select Source ROI");
+        gd = new GenericDialog("Synchronize ROIs - Select Source ROI");
 
         String[] rois = source.listRois().stream().map(CaRoiBox::getName).toArray(String[]::new);
         boolean[] bs = new boolean[rois.length];
@@ -839,7 +839,7 @@ public class CaNeuronWindow extends JFrame implements CaOutline.Delegate, ImageL
         mb.createMenuItem("Add files", 4);
         mb.createMenuItem("Remove files", 5);
         mb.createMenu("Tools");
-        mb.createMenuItem("Copy ROIs", 24);
+        mb.createMenuItem("Synchronize ROIs", 24);
         mb.createMenuItem("Trace to ROI", 13);
         mb.createMenuItem("Align ROIs", 6);
         mb.createSeparator();
