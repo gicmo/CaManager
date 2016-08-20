@@ -103,6 +103,10 @@ public class CaNIXImporter extends CaImporter {
         im.ctime = meta.getProperty("creation_time").getValues().get(0).getLong();
         im.channels = meta.getProperty("channels").getValues().get(0).getInt();
 
+        if (meta.hasProperty("condition")) {
+            img.setCondition(meta.getProperty("condition").getValues().get(0).getString());
+        }
+
         DataArray chans = g.getDataArray(g.getName() + ".channels");
         RangeDimension dim = chans.getDimensions().get(0).asRangeDimension();
 
