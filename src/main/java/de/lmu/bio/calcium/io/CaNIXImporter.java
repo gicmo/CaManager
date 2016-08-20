@@ -72,6 +72,10 @@ public class CaNIXImporter extends CaImporter {
             neuron.setLitter(meta.getProperty("litter").getValues().get(0).getString());
         }
 
+        if (meta.hasProperty("comment")) {
+            neuron.setComment(meta.getProperty("comment").getValues().get(0).getString());
+        }
+
         List<Group> imgGroups = block.getGroups(g -> g.getType().equals("image.ca"));
         imagesTotal = imgGroups.size();
 
