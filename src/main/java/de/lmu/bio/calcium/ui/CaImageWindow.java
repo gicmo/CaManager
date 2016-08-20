@@ -7,12 +7,14 @@ import ij.IJ;
 import ij.ImagePlus;
 import ij.gui.*;
 
+import javax.swing.event.TreeModelEvent;
+import javax.swing.event.TreeModelListener;
 import javax.swing.tree.DefaultTreeModel;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
-public class CaImageWindow extends StackWindow implements MouseListener {
+public class CaImageWindow extends StackWindow implements MouseListener, TreeModelListener{
     protected CaImage image;
     protected DefaultTreeModel treeModel;
 
@@ -23,6 +25,7 @@ public class CaImageWindow extends StackWindow implements MouseListener {
         CaIWOverlay overlay = new CaIWOverlay();
         imp.setOverlay(overlay);
         getCanvas().addMouseListener(this);
+        treeModel.addTreeModelListener(this);
     }
 
     public static CaImageWindow createWindow(CaImage img, DefaultTreeModel treeModel) {
@@ -92,13 +95,61 @@ public class CaImageWindow extends StackWindow implements MouseListener {
     @Override
     public void mouseExited(MouseEvent e) { }
 
+
+    @Override
+    public void treeNodesChanged(TreeModelEvent e) {}
+
+    @Override
+    public void treeNodesInserted(TreeModelEvent e) {}
+
+    @Override
+    public void treeNodesRemoved(TreeModelEvent e) { }
+
+    @Override
+    public void treeStructureChanged(TreeModelEvent e) {
+        System.err.print("[+] treeStructureChanged !!");
+        //lets do a two way sync
+        Overlay overlay = imp.getOverlay();
+        Roi[] ours = overlay.toArray();
+        java.util.List<CaRoiBox> theirs = image.listRois();
+        //O(n^2) but so few rois!
+        for (Roi r : ours) {
+            boolean have = false;
+            for (CaRoiBox b : theirs) {
+                if (b.getRoi() == r) {
+                    have = true;
+                    break;
+                }
+            }
+
+            if (!have) {
+                overlay.remove(r);
+            }
+        }
+
+        for (CaRoiBox b : theirs) {
+            boolean have = false;
+            for (Roi r : ours) {
+                if (b.getRoi() == r) {
+                    have = true;
+                    break;
+                }
+            }
+
+            if (!have) {
+                overlay.add(b.getRoi());
+            }
+        }
+
+        getCanvas().repaint();
+    }
+
     //------------------------------------------------------------------------------------------------------------------
     public class CaIWOverlay extends Overlay {
 
         public CaIWOverlay() {
             for (CaRoiBox box : image.listRois()) {
                 add(box.getRoi());
-
             }
 
             drawLabels(true);
