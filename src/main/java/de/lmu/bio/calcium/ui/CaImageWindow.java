@@ -28,6 +28,13 @@ public class CaImageWindow extends StackWindow implements MouseListener, TreeMod
         treeModel.addTreeModelListener(this);
     }
 
+    @Override
+    public boolean close() {
+        boolean res = super.close();
+        treeModel.removeTreeModelListener(this);
+        return res;
+    }
+
     public static CaImageWindow createWindow(CaImage img, DefaultTreeModel treeModel) {
         ImagePlus ip = img.openImage();
 
