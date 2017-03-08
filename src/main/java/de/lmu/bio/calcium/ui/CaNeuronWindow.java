@@ -498,8 +498,7 @@ public class CaNeuronWindow extends JFrame implements CaOutline.Delegate, ImageL
             finishTask(aligner);
 
         } catch (Exception e) {
-            System.err.println(e.getStackTrace().toString());
-            IJ.log(e.getStackTrace().toString());
+            e.printStackTrace(System.err);
         }
     }
 
@@ -516,8 +515,7 @@ public class CaNeuronWindow extends JFrame implements CaOutline.Delegate, ImageL
             finishTask(estimator);
 
         } catch (Exception e) {
-            System.err.println(e.getStackTrace().toString());
-            IJ.log(e.getStackTrace().toString());
+            e.printStackTrace(System.err);
         }
     }
 
@@ -554,8 +552,7 @@ public class CaNeuronWindow extends JFrame implements CaOutline.Delegate, ImageL
             finishTask(estimator);
 
         } catch (Exception e) {
-            System.err.println(e.getStackTrace().toString());
-            IJ.log(e.getStackTrace().toString());
+            e.printStackTrace(System.err);
         }
     }
 
@@ -588,8 +585,7 @@ public class CaNeuronWindow extends JFrame implements CaOutline.Delegate, ImageL
             IJ.runPlugIn("de.lmu.bio.calcium.CaDriftCorrector_", "");
 
         } catch (Exception e) {
-            System.err.println(e.getStackTrace().toString());
-            IJ.log(e.getStackTrace().toString());
+            e.printStackTrace(System.err);
         }
     }
 
@@ -670,8 +666,7 @@ public class CaNeuronWindow extends JFrame implements CaOutline.Delegate, ImageL
 
 
         } catch (Exception e) {
-            System.err.println(e.getStackTrace().toString());
-            IJ.log(e.getStackTrace().toString());
+            e.printStackTrace(System.err);
         }
     }
 
@@ -685,8 +680,7 @@ public class CaNeuronWindow extends JFrame implements CaOutline.Delegate, ImageL
             IJ.runPlugIn("de.lmu.bio.calcium.CaTraceToRoi_", "");
 
         } catch (Exception e) {
-            System.err.println(e.getStackTrace().toString());
-            IJ.log(e.getStackTrace().toString());
+            e.printStackTrace(System.err);
         }
     }
 
