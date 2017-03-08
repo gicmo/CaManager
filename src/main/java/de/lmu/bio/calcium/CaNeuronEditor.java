@@ -75,6 +75,7 @@ public class CaNeuronEditor extends JDialog {
 
     private void onOK() {
         //FIXME ensure name.getText() makes sense
+        neuron.setAge(age.getText());
         neuron.setName(name.getText());
         neuron.setRegion((String) region.getSelectedItem());
         neuron.setSex(cbSex.getSelectedItem().toString());
