@@ -30,6 +30,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 
@@ -329,31 +330,40 @@ public class CaNeuronWindow extends JFrame implements CaOutline.Delegate, ImageL
         finishTask(importer);
     }
 
-    @MenuEntry(entryid = 24)
-    public void copyROIs() {
-
+    private CaImage askUserForImage(String title, String label) {
         CaNeuron neuron = getNeuron();
-
-        GenericDialog gd = new GenericDialog("Synchronize ROIs - Select Image");
+        GenericDialog gd = new GenericDialog(title +  " - Select Image");
         ArrayList<CaImage> images = neuron.getImages(true);
 
         if (images.size() < 1) {
             IJ.showMessage("No Images", "No images :( Need some!");
-            return;
+            return null;
         }
 
         String[] names = images.stream().map(CaImage::getName).toArray(String[]::new);
-        gd.addChoice("Source Image: ", names, names[0]);
+        gd.addChoice(label + " image: ", names, names[0]);
         gd.showDialog();
 
-        if (gd.wasCanceled())
-            return;
+        if (gd.wasCanceled()) {
+            return null;
+        }
 
         int idx = gd.getNextChoiceIndex();
-        CaImage source = images.get(idx);
+        return images.get(idx);
+    }
+
+    @MenuEntry(entryid = 24)
+    public void copyROIs() {
+
+        CaImage source = askUserForImage("Synchronize ROIs", "Source");
+
+        if (source == null) {
+            return;
+        }
+
         System.err.print("Using source image: " + source.getName());
 
-        gd = new GenericDialog("Synchronize ROIs - Select Source ROI");
+        GenericDialog gd = new GenericDialog("Synchronize ROIs - Select Source ROI");
 
         String[] rois = source.listRois().stream().map(CaRoiBox::getName).toArray(String[]::new);
         boolean[] bs = new boolean[rois.length];
@@ -365,6 +375,8 @@ public class CaNeuronWindow extends JFrame implements CaOutline.Delegate, ImageL
 
         if (gd.wasCanceled())
             return;
+
+        ArrayList<CaImage> images = getNeuron().getImages(true);
 
         Point shift = new Point(0, 0);
         for (String id : rois) {
@@ -386,19 +398,26 @@ public class CaNeuronWindow extends JFrame implements CaOutline.Delegate, ImageL
 
     @MenuEntry(entryid = 25)
     public void addRectROI() {
-        CaNeuron neuron = getNeuron();
 
-        GenericDialog gd = new GenericDialog("Add Rect ROIs - Select Image");
-        ArrayList<CaImage> images = neuron.getImages(true);
+        CaImage target = askUserForImage("Add Rect ROI", "Target");
 
-        if (images.size() < 1) {
-            IJ.showMessage("No Images", "No images :( Need some!");
+        if (target == null) {
             return;
         }
 
-        String[] names = images.stream().map(CaImage::getName).toArray(String[]::new);
-        gd.addChoice("Target Image: ", names, names[0]);
+        CaNeuron neuron = getNeuron();
+
+        GenericDialog gd = new GenericDialog("Add Rect ROI - Rect configuration");
+
+        java.util.List<String> nl = target.listRois().stream().map(CaRoiBox::getName).collect(Collectors.toList());;
+
+        //must be index zero for the code below to work correctly
+        nl.add(0, "<Image>");
+
+        String[] names = nl.toArray(new String[nl.size()]);
+
         gd.addNumericField("Rect size", 10, 0);
+        gd.addChoice("Relative to: ", names, names[names.length > 1 ? 1 : 0]);
         gd.addNumericField("Offset  X", 10, 0);
         gd.addNumericField("Offset  Y", 10, 0);
         gd.showDialog();
@@ -406,13 +425,19 @@ public class CaNeuronWindow extends JFrame implements CaOutline.Delegate, ImageL
         if (gd.wasCanceled())
             return;
 
-        int idx = gd.getNextChoiceIndex();
-        CaImage target = images.get(idx);
-        System.err.print("Using target image: " + target.getName());
-
         int size = (int) gd.getNextNumber();
+
+        int idx = gd.getNextChoiceIndex();
         int x = (int) gd.getNextNumber();
         int y = (int) gd.getNextNumber();
+
+        //x, y are relative to an ROI
+        if (idx > 0) {
+            CaRoiBox rb = target.getRoiBox(names[idx]);
+            Rectangle r = rb.getRoi().getBounds();
+            x += r.x + r.width / 2.0;
+            y += r.y + r.height / 2.0;
+        }
 
         Roi roi = new Roi(x, y, size, size);
         CaRoiBox box = target.maybeAddRoi(roi);
@@ -423,29 +448,17 @@ public class CaNeuronWindow extends JFrame implements CaOutline.Delegate, ImageL
 
     @MenuEntry(entryid = 26)
     public void duplicateROI() {
-        CaNeuron neuron = getNeuron();
 
-        GenericDialog gd = new GenericDialog("Duplicate ROIs - Select Image");
-        ArrayList<CaImage> images = neuron.getImages(true);
+        CaImage target = askUserForImage("Duplicate ROIs", "Target");
 
-        if (images.size() < 1) {
-            IJ.showMessage("No Images", "No images :( Need some!");
+        if (target == null) {
             return;
         }
 
-        String[] names = images.stream().map(CaImage::getName).toArray(String[]::new);
-        gd.addChoice("Target Image: ", names, names[0]);
-        gd.showDialog();
-
-        if (gd.wasCanceled())
-            return;
-
-        int idx = gd.getNextChoiceIndex();
-        CaImage target = images.get(idx);
+        GenericDialog gd = new GenericDialog("Duplicate ROIs - Select Source ROI");
         System.err.print("Using target image: " + target.getName());
 
-        gd = new GenericDialog("Duplicate ROIs - Select Source ROI");
-        names = target.listRois().stream().map(CaRoiBox::getName).toArray(String[]::new);
+        String[] names = target.listRois().stream().map(CaRoiBox::getName).toArray(String[]::new);
         gd.addChoice("Source ROIs: ", names, names[0]);
         gd.addNumericField("Offset  X", 10, 0);
         gd.addNumericField("Offset  Y", 10, 0);
@@ -454,7 +467,7 @@ public class CaNeuronWindow extends JFrame implements CaOutline.Delegate, ImageL
         if (gd.wasCanceled())
             return;
 
-        idx = gd.getNextChoiceIndex();
+        int idx = gd.getNextChoiceIndex();
         Roi old = target.getRoi(names[idx]);
 
         int x = (int) gd.getNextNumber();
