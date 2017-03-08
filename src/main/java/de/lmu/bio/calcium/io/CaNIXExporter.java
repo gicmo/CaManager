@@ -93,7 +93,7 @@ public class CaNIXExporter extends CaTask {
             DataArray rd = saveRoiData(roi);
             group.addDataArray(rd);
 
-            DataArray roiXY = saveRoiXY(xy, prefix + ".roi.xy." + name, "roi.xy." + name);
+            DataArray roiXY = saveRoiXY(xy, prefix + ".roi.xy." + name, "roi.xy." + type);
             group.addDataArray(roiXY);
 
             return true;
@@ -271,6 +271,10 @@ public class CaNIXExporter extends CaTask {
         String value;
         if ((value = neuron.getComment()) != null && value.length() > 0) {
             meta.createProperty("comment", new Value(value));
+        }
+
+        if ((value = neuron.getExperiment()) != null && value.length() > 0) {
+            meta.createProperty("experiment", new Value(value));
         }
 
         if ((value = neuron.getAge()) != null && value.length() > 0) {

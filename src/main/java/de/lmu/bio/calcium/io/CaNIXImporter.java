@@ -56,6 +56,10 @@ public class CaNIXImporter extends CaImporter {
             neuron.setAge(meta.getProperty("age").getValues().get(0).getString());
         }
 
+        if (meta.hasProperty("experiment")) {
+            neuron.setExperiment(meta.getProperty("experiment").getValues().get(0).getString());
+        }
+
         if (meta.hasProperty("condition")) {
             neuron.setCondition(meta.getProperty("condition").getValues().get(0).getString());
         }

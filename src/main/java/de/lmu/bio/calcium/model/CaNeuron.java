@@ -14,6 +14,7 @@ public class CaNeuron extends CaGroup {
     private String condition;
     private String subregion;
     private String litter;
+    private String experiment;
 
     public CaNeuron(String name) {
         super(name);
@@ -25,6 +26,14 @@ public class CaNeuron extends CaGroup {
 
     public void setName(String value) {
         setUserObject(value);
+    }
+
+    public String getExperiment() {
+        return experiment;
+    }
+
+    public void setExperiment(String experiment) {
+        this.experiment = experiment;
     }
 
     public String getAge() {
