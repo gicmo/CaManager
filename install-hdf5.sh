@@ -1,5 +1,8 @@
 #!/bin/sh
 
+H5J_VERSION=${H5J_VERSION:-2.11.0}
+H5J_HOME=${H5J_HOME:-~/Downloads}
+
 echo "HOME:    $H5J_HOME"
 echo "VERSION: $H5J_VERSION"
 
