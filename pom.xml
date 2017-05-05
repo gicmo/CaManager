@@ -11,6 +11,7 @@
     <properties>
         <kotlin.version>1.0.0</kotlin.version>
         <hdf5.version>2.11.0</hdf5.version>
+	<nix.version>1.3.2</nix.version>
     </properties>
 
 
@@ -95,7 +96,7 @@
         <dependency>
             <groupId>org.g_node</groupId>
             <artifactId>nix-java</artifactId>
-            <version>1.3.2</version>
+            <version>${nix.version}</version>
         </dependency>
 
         <!-- H5 -->
